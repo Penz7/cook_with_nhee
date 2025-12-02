@@ -34,23 +34,21 @@ class GetHttpService extends GetxService implements IHttpClient {
     query ??= {};
     var uri = Uri.parse(url);
     if (uri.host.isEmpty) {
-      // Ghi log để kiểm tra baseUrl đang truyền vào có đúng format hay không (có http/https hay chưa)
-      log('========> Build URI from baseUrl: $_baseUrl | path: $url');
       uri = Uri.parse(_baseUrl + url);
     }
 
     try {
       // Ghi log request chi tiết trước khi call API
-      log('========> REQUEST: ${method.toString().split('.').last} ${uri.toString()}');
-      log('========> Content-Type: $requestContentType');
+      // log('========> REQUEST: ${method.toString().split('.').last} ${uri.toString()}');
+      // log('========> Content-Type: $requestContentType');
       if (headers != null && headers.isNotEmpty) {
-        log('========> Headers: $headers');
+        // log('========> Headers: $headers');
       }
       if (query!.isNotEmpty) {
-        log('========> Query: $query');
+        // log('========> Query: $query');
       }
       if (body != null) {
-        log('========> Body: $body');
+        // log('========> Body: $body');
       }
 
       final response = await _http
@@ -65,23 +63,22 @@ class GetHttpService extends GetxService implements IHttpClient {
           )
           .timeout(const Duration(seconds: 60));
 
-      log('========> ${method.toString().split('.').last}: ${uri.toString()}');
+      // log('========> ${method.toString().split('.').last}: ${uri.toString()}');
       // log('Header: $requestHeaders');
       if (body != null) {
         // log('Body: $body');
       }
       // log('Query: $query');
-      log('========> RESPONSE BODY: ${response.body}');
-      log(
-          '========> RESPONSE STATUS: ${response.statusCode} ${response.statusText ?? ''}');
+      // log('========> RESPONSE BODY: ${response.body}');
+      // log(
+      //     '========> RESPONSE STATUS: ${response.statusCode} ${response.statusText ?? ''}');
 
       if (response.statusCode != null && response.statusCode! < 400) {
         return response.body;
       } else {
-        // Ghi log chi tiết khi statusCode >= 400 để debug
-        log(
-            '========> CALL API ERROR: ${response.statusCode} | ${response.statusText}');
-        log('========> ERROR RESPONSE BODY: ${response.body}');
+        // log(
+        //     '========> CALL API ERROR: ${response.statusCode} | ${response.statusText}');
+        // log('========> ERROR RESPONSE BODY: ${response.body}');
 
         if (response.statusCode == 401) {
           throw Exception();
@@ -93,14 +90,11 @@ class GetHttpService extends GetxService implements IHttpClient {
             (response.statusText != null &&
                 response.statusText!
                     .contains('SocketException: Failed host lookup:'))) {
-          // Lỗi network (không truy cập được server)
           throw Exception();
         }
-        // Lỗi HTTP khác (4xx, 5xx)
         throw Exception();
       }
     } on GetHttpException catch (e, s) {
-      // Ghi log chi tiết khi GetConnect ném GetHttpException (thường gặp trên Web: XMLHttpRequest error)
       log('========> GetHttpException: ${e.message}');
       log('========> GetHttpException runtimeType: ${e.runtimeType}');
       log('========> GetHttpException stackTrace: $s');

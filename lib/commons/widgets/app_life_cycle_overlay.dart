@@ -43,7 +43,8 @@ class _AppLifecycleOverlayState extends State<AppLifecycleOverlay>
       reverseDuration: const Duration(milliseconds: 500),
       child: Container(
         key: ValueKey(shouldBlur.toString()),
-        child: shouldBlur ? _buildBlur() : const SizedBox.shrink(),
+        // child: shouldBlur ? _buildBlur() : const SizedBox.shrink(),
+        child: const SizedBox.shrink(),
       ),
     );
   }

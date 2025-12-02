@@ -11,15 +11,25 @@ class AppCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
+        // Soft pink card background to match app theme
         gradient: LinearGradient(
-          colors: [UIColors.primaryColorFade, UIColors.secondaryColorFade],
-          stops: [0, 1],
-          begin: AlignmentGeometry.topCenter,
-          end: AlignmentGeometry.bottomCenter,
+          colors: [
+            Colors.pink.shade50,
+            Colors.pink.shade100.withOpacity(0.6),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.all(Radius.circular(16)),
+        borderRadius: const BorderRadius.all(Radius.circular(18)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.pink.shade100.withOpacity(0.5),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
-      padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: body,
     );
   }
