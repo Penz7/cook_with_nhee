@@ -78,6 +78,8 @@ class _AppState extends State<App> {
       theme: ThemeData(
         colorScheme: lightScheme,
         scaffoldBackgroundColor: lightScheme.surface,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
         cardTheme: CardThemeData(
           color: lightScheme.surface,
         ),

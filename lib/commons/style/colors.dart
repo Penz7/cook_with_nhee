@@ -1,17 +1,12 @@
 import 'dart:ui';
 
 class UIColors {
-  static const Color backgroundColor = Color(0xFFf6f7fb);
+  static const Color backgroundColor = Color(0xFFFCF8F8);
 
-  static const Color primaryColor = Color(0xFF8a66fa);
-  static const Color primaryColorFade = Color(0xFFc1aeff);
-
-  static const Color secondaryColor = Color(0xFFfde00b);
-  static const Color secondaryColorFade = Color(0xFFfde00b);
-
-  static const Color primaryCard = Color(0xFFffc659);
-  static const Color primaryBgCard = Color(0xFFffe09d);
-
-  static const Color secondaryCard = Color(0xFFffd098);
-  static const Color secondaryBgCard = Color(0xFFffeacd);
+  static const Color textColor = Color(0xFF5A0E24);
+  static const Color blue = Color(0xFFA8D1E7);
+  static const Color creamy = Color(0xFFFCFAF2);
+  static const Color pinkLight = Color(0xFFFFBFC5);
+  static const Color pink = Color(0xFFEB8DB5);
+  static const Color purple = Color(0xFFD4A3C4);
 }

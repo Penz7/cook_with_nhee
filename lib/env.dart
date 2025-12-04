@@ -7,8 +7,6 @@ class Env {
     if (kDebugMode) {
       print('APP_NAME: $appName');
       print('FLAVOR: $flavor');
-      print('API_URL: $apiUrl');
-      print('API_KEY: $apiKey');
     }
   }
 

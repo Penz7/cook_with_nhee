@@ -1,12 +1,17 @@
+import 'package:cook_with_nhee/commons/extensions/color_extension.dart';
+import 'package:cook_with_nhee/commons/extensions/number_extension.dart';
 import 'package:cook_with_nhee/features/splash/splash_controller.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 
+import '../../commons/widgets/app/app_text.dart';
+import '../../commons/widgets/app/primary_scaffold.dart';
+
 class SplashBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut(() => SplashController());
+    Get.lazyPut(() => SplashController(Get.find()));
   }
 }
 
@@ -15,8 +20,7 @@ class SplashPage extends GetView<SplashController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.pink[50],
+    return PrimaryScaffold(
       body: SafeArea(
         child: Container(
           width: double.infinity,
@@ -26,7 +30,7 @@ class SplashPage extends GetView<SplashController> {
               end: Alignment.bottomCenter,
               colors: [
                 Colors.pink.shade50,
-                Colors.pink.shade100.withOpacity(0.5),
+                Colors.pink.shade100.opacityColor(0.5),
               ],
             ),
           ),
@@ -40,7 +44,7 @@ class SplashPage extends GetView<SplashController> {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.pink.shade100.withOpacity(0.7),
+                      color: Colors.pink.shade100.opacityColor(0.7),
                       blurRadius: 18,
                       offset: const Offset(0, 10),
                     ),
@@ -67,31 +71,24 @@ class SplashPage extends GetView<SplashController> {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
-              const Text(
+              24.height,
+              AppText.bold(
                 "Nhee Cooking",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.pink,
-                ),
+                fontSize: 24,
+                color: Colors.pink,
               ),
-              const SizedBox(height: 8),
-              Text(
+              8.height,
+              AppText.regular(
                 "Đang chuẩn bị công thức ngon cho bạn...",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.pink.shade400,
-                ),
+                fontSize: 14,
+                color: Colors.pink.shade400,
               ),
-              const SizedBox(height: 12),
+              12.height,
               Obx(
-                () => Text(
+                () => AppText.regular(
                   "Sẵn sàng sau ${controller.countdown.value}s",
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.pink.shade300,
-                  ),
+                  fontSize: 13,
+                  color: Colors.pink.shade300,
                 ),
               ),
             ],

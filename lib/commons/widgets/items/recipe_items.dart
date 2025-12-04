@@ -5,9 +5,20 @@ import '../../extensions/color_extension.dart';
 import '../../extensions/number_extension.dart';
 
 class RecipeItems extends StatelessWidget {
-  const RecipeItems({super.key, required this.recipe});
+  const RecipeItems({
+    super.key,
+    required this.recipe,
+    this.showSaveButton = false,
+    this.onSave,
+    this.isSaving = false,
+    this.isSaved = false,
+  });
 
   final RecipeModel recipe;
+  final bool showSaveButton;
+  final VoidCallback? onSave;
+  final bool isSaving;
+  final bool isSaved; // Trạng thái đã lưu
 
   static const List<Color> _lightColors = [
     Color(0xFFF5E6E8), // hồng nhạt
@@ -27,63 +38,170 @@ class RecipeItems extends StatelessWidget {
     final bgColor = _getColor(colorIndex);
 
     return Container(
-      padding: EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: bgColor.opacityColor(0.8),
-        borderRadius: BorderRadius.circular(15),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.opacityColor(0.1),
-            spreadRadius: 2,
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+            color: bgColor.opacityColor(0.3),
+            spreadRadius: 1,
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(
+          color: bgColor.opacityColor(0.4),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            recipe.name ?? '',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      recipe.name ?? '',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.pink.shade900,
+                        fontFamily: GoogleFonts.poppins().fontFamily,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    8.height,
+                    if (recipe.description != null &&
+                        recipe.description!.isNotEmpty)
+                      Text(
+                        recipe.description ?? '',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade700,
+                          height: 1.4,
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                  ],
+                ),
+              ),
+              if (showSaveButton) ...[
+                12.width,
+                InkWell(
+                  onTap: isSaving ? null : onSave,
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.pink.shade50,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: Colors.pink.shade200,
+                        width: 1,
+                      ),
+                    ),
+                    child: isSaving
+                        ? SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.pink.shade400,
+                              ),
+                            ),
+                          )
+                        : Icon(
+                            isSaved
+                                ? Icons.favorite
+                                : Icons.bookmark_add_outlined,
+                            size: 20,
+                            color: isSaved
+                                ? Colors.red.shade600
+                                : Colors.pink.shade600,
+                          ),
+                  ),
+                ),
+              ],
+            ],
           ),
-          10.height,
-          Text(
-            recipe.description ?? '',
-            style: TextStyle(
-              fontSize: 16,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-            ),
-          ),
-          20.height,
+          16.height,
           Row(
             children: [
-              Icon(Icons.timelapse, size: 15, color: Colors.black),
-              12.width,
-              Text(
-                'Nấu: ${recipe.cookTime}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.black,
-                  fontFamily: GoogleFonts.poppins().fontFamily,
+              if (recipe.cookTime != null) ...[
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: bgColor.opacityColor(0.6),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.restaurant_outlined,
+                        size: 14,
+                        color: Colors.pink.shade700,
+                      ),
+                      6.width,
+                      Text(
+                        'Nấu: ${recipe.cookTime}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.pink.shade800,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              20.width,
-              Icon(Icons.pause_presentation, size: 15, color: Colors.black),
-              12.width,
-              Text(
-                'Chuẩn bị: ${recipe.prepTime}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.black,
-                  fontFamily: GoogleFonts.poppins().fontFamily,
+              ],
+              if (recipe.prepTime != null && recipe.cookTime != null) ...[
+                8.width,
+              ],
+              if (recipe.prepTime != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: bgColor.opacityColor(0.6),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.timer_outlined,
+                        size: 14,
+                        color: Colors.pink.shade700,
+                      ),
+                      6.width,
+                      Text(
+                        'Chuẩn bị: ${recipe.prepTime}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.pink.shade800,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
             ],
           ),
         ],

@@ -2,13 +2,17 @@ import 'dart:developer';
 
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/exceptions/exceptions.dart';
+import '../constants/storage_key.dart';
 import '../http_interface.dart';
+import '../storage_interace.dart';
 
 class GetHttpService extends GetxService implements IHttpClient {
+  late final IStorage _storage;
   late final GetConnect _http;
   late final String _baseUrl;
 
-  Future<GetHttpService> init(String baseUrl) async {
+  Future<GetHttpService> init(IStorage storage,String baseUrl) async {
+    _storage = storage;
     _baseUrl = baseUrl;
     _http = GetConnect(timeout: Duration(seconds: 60));
     return this;
@@ -23,14 +27,17 @@ class GetHttpService extends GetxService implements IHttpClient {
     String? contentType,
     Function(double percent)? uploadProgress,
   }) async {
-    // final token = await _storage.get<String>(StorageKey.token);
-    // final requestHeaders = {
-    //   if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
-    //   if (headers != null) ...headers,
-    // };
+    final token = await _storage.get<String>(StorageKey.token);
+    final requestHeaders = {
+      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+      if (headers != null) ...headers,
+    };
 
     final requestContentType = contentType ?? 'application/json';
 
+    if (headers != null) {
+      requestHeaders.addAll(headers);
+    }
     query ??= {};
     var uri = Uri.parse(url);
     if (uri.host.isEmpty) {
@@ -44,7 +51,7 @@ class GetHttpService extends GetxService implements IHttpClient {
       if (headers != null && headers.isNotEmpty) {
         // log('========> Headers: $headers');
       }
-      if (query!.isNotEmpty) {
+      if (query.isNotEmpty) {
         // log('========> Query: $query');
       }
       if (body != null) {
@@ -56,7 +63,7 @@ class GetHttpService extends GetxService implements IHttpClient {
             uri.toString(),
             method.toString().split('.').last,
             body: body,
-            // headers: requestHeaders,
+            headers: requestHeaders,
             query: query,
             contentType: requestContentType,
             uploadProgress: uploadProgress,
@@ -76,9 +83,9 @@ class GetHttpService extends GetxService implements IHttpClient {
       if (response.statusCode != null && response.statusCode! < 400) {
         return response.body;
       } else {
-        // log(
-        //     '========> CALL API ERROR: ${response.statusCode} | ${response.statusText}');
-        // log('========> ERROR RESPONSE BODY: ${response.body}');
+        log(
+            '========> CALL API ERROR: ${response.statusCode} | ${response.statusText}');
+        log('========> ERROR RESPONSE BODY: ${response.body}');
 
         if (response.statusCode == 401) {
           throw Exception();

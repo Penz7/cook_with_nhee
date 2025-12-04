@@ -7,8 +7,8 @@ import 'controller/init_controller.dart';
 import 'network/services/init_service.dart';
 
 Future<void> initConfig() async {
-  await initControllers();
   await initServices();
+  await initControllers();
   HttpOverrides.global = MyHttpOverrides();
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

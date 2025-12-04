@@ -15,6 +15,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   json_annotation: ^4.9.0
   get: ^4.7.3
+  get_storage: ^2.1.1
   sentry_flutter: ^9.8.0
   flutter_svg: ^2.2.3
   intl: ^0.20.2
@@ -23,6 +24,8 @@ dependencies:
   firebase_messaging: ^16.0.4
   cloud_firestore: ^6.1.0
   http: ^1.6.0
+  cached_network_image: ^3.4.1
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:

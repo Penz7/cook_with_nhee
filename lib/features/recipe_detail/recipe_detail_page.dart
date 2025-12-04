@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:get/get.dart';
 
+import '../../commons/widgets/app/app_text.dart';
 import '../../network/models/recipe_model.dart';
+import '../home/home_controller.dart';
 
 class RecipeDetailPage extends StatelessWidget {
   final RecipeModel recipe;
@@ -10,23 +12,54 @@ class RecipeDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final homeController =
+        Get.isRegistered<HomeController>() ? Get.find<HomeController>() : null;
+
     return Scaffold(
-      backgroundColor: Colors.pink[50],
-      appBar: AppBar(
-        backgroundColor: Colors.pink.shade100,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.pink),
-        title: Text(
-          recipe.name ?? '',
-          style: TextStyle(
-            color: Colors.pink.shade900,
-            fontWeight: FontWeight.w700,
+        backgroundColor: Colors.pink[50],
+        appBar: AppBar(
+          backgroundColor: Colors.pink.shade100,
+          elevation: 0,
+          iconTheme: const IconThemeData(color: Colors.pink),
+          title: AppText.bold(
+            recipe.name ?? '',
             fontSize: 18,
-            fontFamily: GoogleFonts.poppins().fontFamily,
+            color: Colors.pink.shade900,
           ),
+          centerTitle: true,
+          actions: [
+            if (homeController != null)
+              Obx(() {
+                final isSaving = homeController.isSavingRecipe(recipe);
+                final isSaved = homeController.isRecipeSaved(recipe);
+                return IconButton(
+                  icon: isSaving
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.pink.shade900,
+                            ),
+                          ),
+                        )
+                      : Icon(
+                          isSaved ? Icons.favorite : Icons.bookmark_add_outlined,
+                          color: isSaved
+                              ? Colors.red.shade600
+                              : Colors.pink.shade900,
+                        ),
+                  onPressed: isSaving
+                      ? null
+                      : () {
+                          homeController.saveRecipe(recipe);
+                        },
+                  tooltip: isSaved ? 'Đã lưu' : 'Lưu công thức',
+                );
+              }),
+          ],
         ),
-        centerTitle: true,
-      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -39,9 +72,9 @@ class RecipeDetailPage extends StatelessWidget {
           ),
         ),
         child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: ListView(
-          children: [
+          padding: const EdgeInsets.all(16),
+          child: ListView(
+            children: [
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -73,14 +106,10 @@ class RecipeDetailPage extends StatelessWidget {
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: Text(
+                          child: AppText.bold(
                             recipe.name ?? '',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.pink.shade900,
-                              fontFamily: GoogleFonts.poppins().fontFamily,
-                            ),
+                            fontSize: 20,
+                            color: Colors.pink.shade900,
                           ),
                         ),
                       ],
@@ -107,14 +136,10 @@ class RecipeDetailPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              Text(
+              AppText.bold(
                 'Nguyên liệu',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
-                  color: Colors.pink.shade800,
-                  fontFamily: GoogleFonts.poppins().fontFamily,
-                ),
+                fontSize: 16,
+                color: Colors.pink.shade800,
               ),
               const SizedBox(height: 8),
               Container(
@@ -138,12 +163,10 @@ class RecipeDetailPage extends StatelessWidget {
                               ),
                               const SizedBox(width: 8),
                               Expanded(
-                                child: Text(
+                                child: AppText.regular(
                                   '${ing.name}: ${ing.quantity}',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey.shade800,
-                                  ),
+                                  fontSize: 14,
+                                  color: Colors.grey.shade800,
                                 ),
                               ),
                             ],
@@ -154,14 +177,10 @@ class RecipeDetailPage extends StatelessWidget {
                 ),
             ),
             const SizedBox(height: 20),
-              Text(
+              AppText.bold(
                 'Các bước thực hiện',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
-                  color: Colors.pink.shade800,
-                  fontFamily: GoogleFonts.poppins().fontFamily,
-                ),
+                fontSize: 16,
+                color: Colors.pink.shade800,
               ),
               const SizedBox(height: 8),
               Container(
@@ -200,9 +219,9 @@ class RecipeDetailPage extends StatelessWidget {
                               ),
                               const SizedBox(width: 8),
                               Expanded(
-                                child: Text(
+                                child: AppText.regular(
                                   entry.value,
-                                  style: const TextStyle(fontSize: 14),
+                                  fontSize: 14,
                                 ),
                               ),
                             ],
@@ -214,14 +233,10 @@ class RecipeDetailPage extends StatelessWidget {
               ),
               if (recipe.notes != null && recipe.notes!.isNotEmpty) ...[
             const SizedBox(height: 20),
-                Text(
+                AppText.bold(
                   'Ghi chú',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 16,
-                    color: Colors.pink.shade800,
-                    fontFamily: GoogleFonts.poppins().fontFamily,
-                  ),
+                  fontSize: 16,
+                  color: Colors.pink.shade800,
                 ),
                 const SizedBox(height: 8),
                 Container(
@@ -231,12 +246,10 @@ class RecipeDetailPage extends StatelessWidget {
                     color: Colors.pink.shade50,
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: Text(
+                  child: AppText.regular(
                     recipe.notes!,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.pink.shade700,
-                    ),
+                    fontSize: 14,
+                    color: Colors.pink.shade700,
                   ),
                 ),
               ],
