@@ -54,6 +54,8 @@ class LoginPage extends GetView<LoginController> {
                 8.height,
                 AppText.regular(
                   'Gợi ý món ngon từ chính căn bếp của bạn ✨',
+                  maxLines: 3,
+                  textAlign: TextAlign.center,
                 ),
                 40.height,
                 TextFormField(

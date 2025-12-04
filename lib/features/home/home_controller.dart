@@ -23,6 +23,15 @@ class HomeController extends GetxController {
   final RxSet<String> savedRecipes = <String>{}.obs;
 
   Future<void> getMagicRecipe() async {
+    // Kiểm tra phải có ít nhất 1 nguyên liệu trước khi gọi API
+    if (ingredients.value.trim().isEmpty) {
+      AppToast.info(
+        'Thiếu nguyên liệu',
+        'Vui lòng thêm ít nhất một nguyên liệu trước khi tạo công thức.',
+      );
+      return;
+    }
+
     try {
       isLoading.value = true;
       final response = await _apiClient.getMagicRecipes(ingredients.value);

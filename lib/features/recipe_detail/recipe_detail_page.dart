@@ -166,6 +166,7 @@ class RecipeDetailPage extends StatelessWidget {
                                 child: AppText.regular(
                                   '${ing.name}: ${ing.quantity}',
                                   fontSize: 14,
+                                  maxLines: 4,
                                   color: Colors.grey.shade800,
                                 ),
                               ),
@@ -222,6 +223,7 @@ class RecipeDetailPage extends StatelessWidget {
                                 child: AppText.regular(
                                   entry.value,
                                   fontSize: 14,
+                                  maxLines: 5,
                                 ),
                               ),
                             ],
@@ -250,6 +252,7 @@ class RecipeDetailPage extends StatelessWidget {
                     recipe.notes!,
                     fontSize: 14,
                     color: Colors.pink.shade700,
+                    maxLines: 4,
                   ),
                 ),
               ],
