@@ -72,7 +72,7 @@ class _AppState extends State<App> {
         }
       },
       smartManagement: SmartManagement.full,
-      onGenerateTitle: (context) => 'Cook with Nhee',
+      onGenerateTitle: (context) => Env().appName,
       debugShowCheckedModeBanner: false,
       title: Env().appName,
       theme: ThemeData(
