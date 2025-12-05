@@ -41,7 +41,7 @@ class _RecipeLoadingShimmerState extends State<RecipeLoadingShimmer>
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
-        return Column(
+        return ListView(
           children: List.generate(
             widget.itemCount,
             (index) => Padding(
