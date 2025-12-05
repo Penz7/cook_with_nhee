@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cook_with_nhee/commons/widgets/app/app_toast.dart';
 import 'package:cook_with_nhee/network/models/login_model.dart';
 import 'package:cook_with_nhee/network/models/recipe_from_api_model.dart';
 import 'package:flutter/foundation.dart';
@@ -52,7 +53,17 @@ class ApiClient extends IApiClient {
       '/recipes/create-magic-recipes',
       body: {'question': ingredients},
     );
+    
     return await parseJson(res, (dynamic json) {
+      // Kiểm tra nếu response là object có key "message" (cảnh báo)
+      if (json is Map<String, dynamic> && json.containsKey('message')) {
+        final message = json['message'] as String? ?? 
+            'Hành vi của bạn là nghiêm cấm khi sử dụng. Danh sách nguyên liệu chứa yếu tố nguy hiểm hoặc bị cấm theo quy tắc an toàn thực phẩm.';
+        AppToast.error('Cảnh báo', message);
+        return <RecipeModel>[];
+      }
+      
+      // Nếu không phải message, parse như bình thường
       final list = json as List<dynamic>;
       return list
           .map((item) => RecipeModel.fromJson(item as Map<String, Object?>))
