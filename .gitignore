@@ -118,3 +118,5 @@ app.*.symbols
 
 # FVM Version Cache
 .fvm/
+
+_build_success/
