@@ -1,3 +1,4 @@
+import 'package:cook_with_nhee/commons/extensions/color_extension.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -54,6 +55,7 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   final _navigatorKey = GlobalKey<NavigatorState>();
+  static const double _webMaxContentWidth = 480;
 
   final ColorScheme lightScheme = ColorScheme.fromSeed(
     seedColor: Colors.blue,
@@ -90,14 +92,28 @@ class _AppState extends State<App> {
       getPages: getPages,
       initialRoute: Routes.splash.p,
       locale: Locale('en'),
-      builder: (_, c) {
-        return Overlay(
+      builder: (context, c) {
+        final theme = Theme.of(context);
+        final content = Overlay(
           initialEntries: [
             OverlayEntry(
-              builder: (context) => c!,
+              builder: (overlayContext) => c!,
             ),
             OverlayEntry(builder: (context) => AppLifecycleOverlay()),
           ],
+        );
+        if (!kIsWeb) return content;
+
+        return Container(
+          color: Colors.pink.opacityColor(0.2),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: _webMaxContentWidth,
+              ),
+              child: content,
+            ),
+          ),
         );
       },
       localizationsDelegates: [
