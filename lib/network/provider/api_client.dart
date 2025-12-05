@@ -55,15 +55,12 @@ class ApiClient extends IApiClient {
     );
     
     return await parseJson(res, (dynamic json) {
-      // Kiểm tra nếu response là object có key "message" (cảnh báo)
       if (json is Map<String, dynamic> && json.containsKey('message')) {
         final message = json['message'] as String? ?? 
             'Hành vi của bạn là nghiêm cấm khi sử dụng. Danh sách nguyên liệu chứa yếu tố nguy hiểm hoặc bị cấm theo quy tắc an toàn thực phẩm.';
         AppToast.error('Cảnh báo', message);
         return <RecipeModel>[];
       }
-      
-      // Nếu không phải message, parse như bình thường
       final list = json as List<dynamic>;
       return list
           .map((item) => RecipeModel.fromJson(item as Map<String, Object?>))

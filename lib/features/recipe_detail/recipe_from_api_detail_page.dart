@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../commons/widgets/app/app_text.dart';
+import '../../commons/widgets/media/media_grid.dart';
 import '../../network/models/recipe_from_api_model.dart';
 
 class RecipeFromApiDetailPage extends StatelessWidget {
@@ -82,6 +83,14 @@ class RecipeFromApiDetailPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
+              // Media Grid (Images & Videos)
+              // MediaGrid(
+              //   images: recipe.images ?? [],
+              //   videos: recipe.videos ?? [],
+              // ),
+              if ((recipe.images != null && recipe.images!.isNotEmpty) ||
+                  (recipe.videos != null && recipe.videos!.isNotEmpty))
+                const SizedBox(height: 20),
               if (recipe.ingredients != null && recipe.ingredients!.isNotEmpty) ...[
                 AppText.bold(
                   'Nguyên liệu',

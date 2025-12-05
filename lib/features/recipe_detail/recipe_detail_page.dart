@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../commons/widgets/app/app_text.dart';
+import '../../commons/widgets/media/media_grid.dart';
 import '../../network/models/recipe_model.dart';
 import '../home/home_controller.dart';
 
@@ -137,6 +138,14 @@ class RecipeDetailPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
+              // Media Grid (Images & Videos)
+              // MediaGrid.fromDynamic(
+              //   images: recipe.images,
+              //   videos: recipe.videos,
+              // ),
+              if ((recipe.images != null && recipe.images!.isNotEmpty) ||
+                  (recipe.videos != null && recipe.videos!.isNotEmpty))
+                const SizedBox(height: 20),
               AppText.bold(
                 'Nguyên liệu',
                 fontSize: 16,
