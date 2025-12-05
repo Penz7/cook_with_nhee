@@ -97,7 +97,7 @@ class RecipeItems extends StatelessWidget {
               if (showSaveButton) ...[
                 12.width,
                 InkWell(
-                  onTap: isSaving ? null : onSave,
+                  onTap: (isSaving || isSaved) ? null : onSave,
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(

@@ -25,6 +25,7 @@ class RecipeDetailPage extends StatelessWidget {
             recipe.name ?? '',
             fontSize: 18,
             color: Colors.pink.shade900,
+            maxLines: 3,
           ),
           centerTitle: true,
           actions: [
@@ -50,7 +51,7 @@ class RecipeDetailPage extends StatelessWidget {
                               ? Colors.red.shade600
                               : Colors.pink.shade900,
                         ),
-                  onPressed: isSaving
+                  onPressed: (isSaving || isSaved)
                       ? null
                       : () {
                           homeController.saveRecipe(recipe);
