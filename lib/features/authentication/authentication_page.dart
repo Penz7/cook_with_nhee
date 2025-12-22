@@ -146,7 +146,7 @@ class AuthenticationPage extends GetView<AuthenticationController> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: UIColors.creamy,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(30),
           topRight: Radius.circular(30),
