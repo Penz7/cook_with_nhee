@@ -1,3 +1,5 @@
+import 'package:cook_with_nhee/commons/style/font_sizes.dart';
+import 'package:cook_with_nhee/commons/widgets/app/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../network/models/recipe_model.dart';
@@ -18,14 +20,14 @@ class RecipeItems extends StatelessWidget {
   final bool showSaveButton;
   final VoidCallback? onSave;
   final bool isSaving;
-  final bool isSaved; // Trạng thái đã lưu
+  final bool isSaved;
 
   static const List<Color> _lightColors = [
-    Color(0xFFF5E6E8), // hồng nhạt
-    Color(0xFFE6F5F3), // xanh nhạt
-    Color(0xFFF5F5E6), // vàng nhạt
-    Color(0xFFE6E6F5), // tím nhạt
-    Color(0xFFE6F5E6), // xanh lá nhạt
+    Color(0xFFF5E6E8),
+    Color(0xFFE6F5F3),
+    Color(0xFFF5F5E6),
+    Color(0xFFE6E6F5),
+    Color(0xFFE6F5E6),
   ];
 
   Color _getColor(int index) {
@@ -50,10 +52,7 @@ class RecipeItems extends StatelessWidget {
             offset: const Offset(0, 4),
           ),
         ],
-        border: Border.all(
-          color: bgColor.opacityColor(0.4),
-          width: 1,
-        ),
+        border: Border.all(color: bgColor.opacityColor(0.4), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,7 +71,7 @@ class RecipeItems extends StatelessWidget {
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: Colors.pink.shade900,
-                        fontFamily: GoogleFonts.poppins().fontFamily,
+                        fontFamily: GoogleFonts.manrope().fontFamily,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -86,7 +85,7 @@ class RecipeItems extends StatelessWidget {
                           fontSize: 14,
                           color: Colors.grey.shade700,
                           height: 1.4,
-                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          fontFamily: GoogleFonts.manrope().fontFamily,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -103,10 +102,7 @@ class RecipeItems extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.pink.shade50,
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: Colors.pink.shade200,
-                        width: 1,
-                      ),
+                      border: Border.all(color: Colors.pink.shade200, width: 1),
                     ),
                     child: isSaving
                         ? SizedBox(
@@ -134,7 +130,7 @@ class RecipeItems extends StatelessWidget {
             ],
           ),
           16.height,
-          Row(
+          Wrap(
             children: [
               if (recipe.cookTime != null) ...[
                 Container(
@@ -146,8 +142,7 @@ class RecipeItems extends StatelessWidget {
                     color: bgColor.opacityColor(0.6),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                  child: Wrap(
                     children: [
                       Icon(
                         Icons.restaurant_outlined,
@@ -155,14 +150,10 @@ class RecipeItems extends StatelessWidget {
                         color: Colors.pink.shade700,
                       ),
                       6.width,
-                      Text(
+                      AppText.regular(
                         'Nấu: ${recipe.cookTime}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.pink.shade800,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: GoogleFonts.poppins().fontFamily,
-                        ),
+                        fontSize: FontSizes.moreSmall,
+                        maxLines: 3,
                       ),
                     ],
                   ),
@@ -181,8 +172,7 @@ class RecipeItems extends StatelessWidget {
                     color: bgColor.opacityColor(0.6),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                  child: Wrap(
                     children: [
                       Icon(
                         Icons.timer_outlined,
@@ -190,14 +180,10 @@ class RecipeItems extends StatelessWidget {
                         color: Colors.pink.shade700,
                       ),
                       6.width,
-                      Text(
+                      AppText.regular(
                         'Chuẩn bị: ${recipe.prepTime}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.pink.shade800,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: GoogleFonts.poppins().fontFamily,
-                        ),
+                        fontSize: FontSizes.moreSmall,
+                        maxLines: 3,
                       ),
                     ],
                   ),

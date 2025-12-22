@@ -1,17 +1,26 @@
 import 'dart:convert';
 import 'package:cook_with_nhee/network/models/login_model.dart';
+import 'package:cook_with_nhee/network/models/user_measurement_model.dart';
+import 'package:cook_with_nhee/network/models/user_diet_preference_model.dart';
+import 'package:cook_with_nhee/network/models/healthy_advice_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import '../commons/routes/route.dart';
+import '../commons/widgets/app/app_toast.dart';
 import '../network/constants/storage_key.dart';
 import '../network/jwt.dart';
+import '../network/models/recipe_model.dart';
 import '../network/provider/api_client.dart';
 import '../network/services/storage_service.dart';
 
 class AuthController extends GetxController {
   final ApiClient _apiClient;
   final StorageService _storageService;
+  final RxMap<String, bool> savingRecipes = <String, bool>{}.obs;
+  final RxSet<String> savedRecipes = <String>{}.obs;
+
   AuthController(this._apiClient, this._storageService);
+
 
   bool get isAuth => _currentUser.value != null;
   final RxBool isUserDev = false.obs;
@@ -23,34 +32,87 @@ class AuthController extends GetxController {
   final _currentUser = Rx<User?>(null);
   User? get currentUser => _currentUser.value;
 
+  final _healthyAdvice = Rx<HealthyAdviceModel?>(null);
+  HealthyAdviceModel? get healthyAdvice => _healthyAdvice.value;
+
   Future<AuthController> init() async {
     try {
+      final rememberMe = await _storageService.get(StorageKey.rememberMe);
+      _enableRemember.value = rememberMe == 'true';
       final userJson = await _storageService.get(StorageKey.user);
       if (userJson != null) {
         try {
           final userMap = jsonDecode(userJson);
           _currentUser.value = User.fromJson(userMap);
-          print('User loaded from StorageService: ${_currentUser.value}');
+          debugPrint('User loaded from StorageService');
         } catch (e) {
-          print('Error parsing user from storage: $e');
+          debugPrint('Error parsing user from storage: $e');
+          await _storageService.delete(StorageKey.user);
         }
       }
 
       final token = await _storageService.get(StorageKey.token);
-      if (token != null && !Jwt.isExpired(token)) {
+      if (token != null) {
         try {
-          await getMe();
+          final isExpired = Jwt.isExpired(token);
+          if (isExpired) {
+            debugPrint('Token expired, clearing auth data');
+            _currentUser.value = null;
+            await _storageService.delete(StorageKey.token);
+            await _storageService.delete(StorageKey.user);
+            return this;
+          }
+
+          final payload = Jwt.parseJwtPayLoad(token);
+          final tokenUserId = payload['sub'] ?? payload['id'];
+          
+          if (tokenUserId == null) {
+            debugPrint('Token does not contain user ID, clearing auth data');
+            _currentUser.value = null;
+            await _storageService.delete(StorageKey.token);
+            await _storageService.delete(StorageKey.user);
+            return this;
+          }
+
+          final currentUserId = _currentUser.value?.id;
+          if (currentUserId != null && tokenUserId != currentUserId) {
+            debugPrint('Token user ID mismatch: token=$tokenUserId, current=$currentUserId');
+            _currentUser.value = null;
+            await _storageService.delete(StorageKey.token);
+            await _storageService.delete(StorageKey.user);
+            return this;
+          }
+
+          try {
+            await getMe();
+            debugPrint('User data synced from server successfully');
+          } catch (e) {
+            debugPrint('Error syncing user data from server: $e');
+            if (_currentUser.value == null) {
+              debugPrint('No user data available, clearing token');
+              await _storageService.delete(StorageKey.token);
+            } else {
+              debugPrint('Keeping user from storage despite sync failure');
+            }
+          }
         } catch (e) {
-          print('Error syncing user data from server: $e');
+          debugPrint('Error validating token: $e');
+          _currentUser.value = null;
+          await _storageService.delete(StorageKey.token);
+          await _storageService.delete(StorageKey.user);
+        }
+      } else {
+        if (_currentUser.value != null) {
+          debugPrint('No token but user exists in storage, clearing user');
+          _currentUser.value = null;
+          await _storageService.delete(StorageKey.user);
         }
       }
-
-      final rememberMe = await _storageService.get(StorageKey.rememberMe);
-      _enableRemember.value = rememberMe == 'true';
     } catch (e) {
-      print(e);
-      // Clear corrupted user data
+      debugPrint('Error in AuthController.init: $e');
       await _storageService.delete(StorageKey.user);
+      await _storageService.delete(StorageKey.token);
+      _currentUser.value = null;
     }
     return this;
   }
@@ -62,7 +124,7 @@ class AuthController extends GetxController {
       await _storageService.delete(StorageKey.user);
       await clearSavedCredentials();
       _currentUser.refresh();
-      await Get.offAllNamed(Routes.login.p);
+      await Get.offAllNamed(Routes.auth.p);
     } catch (e) {
       debugPrint("Error during logout: $e");
     }
@@ -72,19 +134,47 @@ class AuthController extends GetxController {
     try {
       final res = await _apiClient.login(email, password);
       if (res.status == 200 && res.data != null) {
-        final user = User(
-          id: res.data?.user?.id,
-          email: res.data?.user?.email,
-        );
+        final loginData = res.data!;
+        final accessToken = loginData.accessToken ?? '';
+        final user = loginData.user;
+
+        if (user == null) {
+          debugPrint('Login response missing user data');
+          return false;
+        }
 
         if (enableRemember) {
           await saveCredentials(email, password);
         }
 
-        await _loginUser(user, res.data?.accessToken ?? '');
+        await _loginUser(user, accessToken);
         return true;
       } else {
-        debugPrint(res.message);
+        debugPrint(res.message ?? 'Login failed');
+        return false;
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> register(String email, String password, String fullName) async {
+    try {
+      final res = await _apiClient.register(email, password, fullName);
+      if (res.status == 201 && res.data != null) {
+        final registerData = res.data!;
+        final accessToken = registerData.accessToken ?? '';
+        final user = registerData.user;
+
+        if (user == null) {
+          debugPrint('Register response missing user data');
+          return false;
+        }
+
+        await _loginUser(user, accessToken);
+        return true;
+      } else {
+        debugPrint(res.message ?? 'Register failed');
         return false;
       }
     } catch (e) {
@@ -96,27 +186,58 @@ class AuthController extends GetxController {
     try {
       final response = await _apiClient.getMe();
       if (response.status == 200 && response.data != null) {
-        final apiUser = response.data;
-        final updatedUser = User(
-          id: apiUser?.id,
-          name: apiUser?.name,
-          phone: apiUser?.phone,
-          hobby: apiUser?.hobby,
-          role: apiUser?.role,
-          recipeQuantity: apiUser?.recipeQuantity,
-          createdAt: apiUser?.createdAt,
-          avatar: apiUser?.avatar,
-          email: apiUser?.email,
+        final apiUser = response.data!;
+        UserMeasurementModel? userMeasurement;
+        UserDietPreferenceModel? userDietPreference;
+        
+        try {
+          final measurementResponse = await _apiClient.getMeasurements();
+          if (measurementResponse.status == 200 && measurementResponse.data != null) {
+            userMeasurement = measurementResponse.data!;
+          }
+        } catch (e) {
+          debugPrint('Error fetching user measurement: $e');
+        }
+        
+        try {
+          final dietPreferenceResponse = await _apiClient.getDietPreference();
+          if (dietPreferenceResponse.status == 200 && dietPreferenceResponse.data != null) {
+            userDietPreference = dietPreferenceResponse.data!;
+          }
+        } catch (e) {
+          debugPrint('Error fetching user diet preference: $e');
+        }
+
+        final updatedUser = apiUser.copyWith(
+          userMeasurement: userMeasurement,
+          userDietPreference: userDietPreference,
         );
 
-        // Lưu vào StorageService
+        if (userMeasurement?.bmi != null && userMeasurement!.bmi! > 0) {
+          try {
+            final healthyAdviceResponse = await _apiClient.getHealthyAdvice(
+              userMeasurement.bmi!.toDouble(),
+            );
+            final statusCode = healthyAdviceResponse.status;
+            if (statusCode != null &&
+                statusCode >= 200 &&
+                statusCode < 300 &&
+                healthyAdviceResponse.data != null) {
+              _healthyAdvice.value = healthyAdviceResponse.data!;
+              debugPrint('Healthy advice fetched successfully');
+            }
+          } catch (e) {
+            debugPrint('Error fetching healthy advice: $e');
+          }
+        }
+
         await _storageService.set(StorageKey.user, jsonEncode(updatedUser.toJson()));
         _currentUser.value = updatedUser;
         return updatedUser;
       }
       return _currentUser.value;
     } catch (e) {
-      print('Error in getMe: $e');
+      debugPrint('Error in getMe: $e');
       return _currentUser.value;
     }
   }
@@ -126,14 +247,16 @@ class AuthController extends GetxController {
       await _storageService.set(StorageKey.user, jsonEncode(user.toJson()));
       _currentUser.value = user;
       await _storageService.set(StorageKey.token, token);
-      await getMe();
-      debugPrint('Logging in user: ${user.id}');
+      debugPrint('User and token saved from login response: ${user.id}');
+      try {
+        await getMe();
+        debugPrint('User data synced from server successfully');
+      } catch (e) {
+        debugPrint("Error syncing user data from server (keeping login data): $e");
+      }
     } catch (e) {
       debugPrint("Error during user login: $e");
-      await _storageService.set(StorageKey.user, jsonEncode(user.toJson()));
-      _currentUser.value = user;
-      await _storageService.set(StorageKey.token, token);
-      await getMe();
+      rethrow;
     }
   }
 
@@ -173,17 +296,125 @@ class AuthController extends GetxController {
     return null;
   }
 
+  /// Fetch healthy advice dựa trên BMI hiện tại
+  Future<void> fetchHealthyAdvice() async {
+    final user = currentUser;
+    if (user?.userMeasurement?.bmi != null && user!.userMeasurement!.bmi! > 0) {
+      try {
+        final response = await _apiClient.getHealthyAdvice(
+          user.userMeasurement!.bmi!.toDouble(),
+        );
+        final statusCode = response.status;
+        if (statusCode != null &&
+            statusCode >= 200 &&
+            statusCode < 300 &&
+            response.data != null) {
+          _healthyAdvice.value = response.data!;
+          debugPrint('Healthy advice fetched successfully');
+        }
+      } catch (e) {
+        debugPrint('Error fetching healthy advice: $e');
+      }
+    }
+  }
+
   Future<bool> checkAuth() async {
     final token = await _storageService.get(StorageKey.token);
-    if (token != null) {
+    if (token == null) {
+      return false;
+    }
+
+    try {
       final isExpired = Jwt.isExpired(token);
-      final payload = Jwt.parseJwtPayLoad(token);
-      if (isExpired || payload['id'] != currentUser?.id) {
+      if (isExpired) {
+        debugPrint('Token expired');
         await _storageService.delete(StorageKey.token);
+        await _storageService.delete(StorageKey.user);
+        _currentUser.value = null;
         return false;
       }
+
+      final payload = Jwt.parseJwtPayLoad(token);
+      // JWT token có 'sub' chứa user ID, không phải 'id'
+      final tokenUserId = payload['sub'] ?? payload['id'];
+      
+      if (tokenUserId == null) {
+        debugPrint('Token does not contain user ID');
+        await _storageService.delete(StorageKey.token);
+        await _storageService.delete(StorageKey.user);
+        _currentUser.value = null;
+        return false;
+      }
+
+      // Nếu có currentUser, validate user ID match
+      final currentUserId = currentUser?.id;
+      if (currentUserId != null && tokenUserId != currentUserId) {
+        debugPrint('Token user ID mismatch: token=$tokenUserId, current=$currentUserId');
+        await _storageService.delete(StorageKey.token);
+        await _storageService.delete(StorageKey.user);
+        _currentUser.value = null;
+        return false;
+      }
+
+      // Token hợp lệ (có thể chưa có user trong memory, nhưng token vẫn hợp lệ)
       return true;
+    } catch (e) {
+      debugPrint('Error checking auth: $e');
+      await _storageService.delete(StorageKey.token);
+      await _storageService.delete(StorageKey.user);
+      _currentUser.value = null;
+      return false;
     }
-    return false;
+  }
+
+  Future<void> loadSavedRecipes() async {
+    try {
+      final response = await _apiClient.getMyRecipes();
+      final data = response.data;
+      if ((response.status == 200 || response.status == 201) && data != null) {
+        savedRecipes
+          ..clear()
+          ..addAll(
+            data.map((item) => item.name).whereType<String>(),
+          );
+      }
+    } catch (e) {
+      debugPrint('Lỗi tải công thức đã lưu: $e');
+    }
+  }
+
+  Future<void> saveRecipe(RecipeModel recipe) async {
+    final recipeKey = recipe.name ?? '';
+    if (recipeKey.isEmpty) return;
+
+    try {
+      savingRecipes[recipeKey] = true;
+      final response = await _apiClient.saveRecipe(recipe);
+      if (response.status == 200 || response.status == 201) {
+        savedRecipes.add(recipeKey);
+        AppToast.success(
+          'Thành công',
+          'Đã lưu công thức "${recipe.name}" vào danh sách của bạn',
+        );
+      }
+    } catch (e) {
+      debugPrint('Lỗi lưu recipe: $e');
+      AppToast.error(
+        'Lỗi',
+        'Không thể lưu công thức. Vui lòng thử lại.',
+      );
+    } finally {
+      savingRecipes[recipeKey] = false;
+    }
+  }
+
+  bool isSavingRecipe(RecipeModel recipe) {
+    final recipeKey = recipe.name ?? '';
+    return savingRecipes[recipeKey] ?? false;
+  }
+
+  bool isRecipeSaved(RecipeModel recipe) {
+    final recipeKey = recipe.name ?? '';
+    return savedRecipes.contains(recipeKey);
   }
 }

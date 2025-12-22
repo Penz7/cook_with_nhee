@@ -10,7 +10,7 @@ class SplashController extends GetxController {
 
   SplashController(this.authController);
 
-  static const int timeSplash = 5;
+  static const int timeSplash = 3;
   var countdown = timeSplash.obs;
   late Timer timer;
 
@@ -36,16 +36,14 @@ class SplashController extends GetxController {
       final isAuthenticated = await _checkAuthenticationStatus();
 
       if (isAuthenticated) {
-        debugPrint("[SPLASH] User is authenticated, navigating to main");
         Get.offAllNamed(Routes.home.p);
       } else {
-        debugPrint("[SPLASH] User not authenticated, navigating to auth");
-        Get.offAllNamed(Routes.login.p);
+        Get.offAllNamed(Routes.auth.p);
       }
     } catch (e, stackTrace) {
-      debugPrint("[SPLASH] Error: $e");
+      debugPrint("[SPLASH] Lỗi: $e");
       debugPrint("[SPLASH] Stack trace: $stackTrace");
-      Get.offAllNamed(Routes.login.p);
+      Get.offAllNamed(Routes.auth.p);
     }
   }
 
@@ -57,22 +55,31 @@ class SplashController extends GetxController {
 
   Future<bool> _checkAuthenticationStatus() async {
     try {
-      if (!authController.isAuth) {
-        debugPrint("[SPLASH] No current user found");
-        return false;
-      }
-
       final isTokenValid = await authController.checkAuth();
       if (!isTokenValid) {
         debugPrint("[SPLASH] Token expired or invalid");
         return false;
       }
-
+      if (!authController.isAuth) {
+        debugPrint("[SPLASH] Token valid but no user in memory, syncing from server");
+        try {
+          final user = await authController.getMe();
+          if (user == null) {
+            debugPrint("[SPLASH] Failed to load user data from server");
+            return false;
+          }
+          debugPrint("[SPLASH] User data loaded from server successfully");
+          return true;
+        } catch (e) {
+          debugPrint("[SPLASH] Failed to sync user data from server: $e");
+          return false;
+        }
+      }
       try {
         await authController.getMe();
         debugPrint("[SPLASH] User data synced successfully");
       } catch (e) {
-        debugPrint("[SPLASH] Failed to sync user data: $e");
+        debugPrint("[SPLASH] Failed to sync user data (keeping existing): $e");
       }
 
       return true;

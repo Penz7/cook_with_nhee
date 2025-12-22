@@ -4,4 +4,5 @@ class StorageKey {
   static const rememberMe = '_rememberMe';
   static const savedEmail = '_savedEmail';
   static const savedPassword = '_savedPassword';
+  static const introCompleted = '_introCompleted';
 }

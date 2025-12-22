@@ -4,6 +4,7 @@ import 'package:cook_with_nhee/commons/widgets/app/app_toast.dart';
 import 'package:cook_with_nhee/controller/auth_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cook_with_nhee/network/models/login_model.dart';
+import 'package:cook_with_nhee/network/models/healthy_advice_model.dart';
 import 'package:cook_with_nhee/network/provider/api_client.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -24,6 +25,8 @@ class ProfileController extends GetxController {
   late TextEditingController emailController;
   final _isLoading = false.obs;
   bool get isLoading => _isLoading.value;
+  final _isUpdatingMeasurement = false.obs;
+  bool get isUpdatingMeasurement => _isUpdatingMeasurement.value;
   final _isUploadingAvatar = false.obs;
   bool get isUploadingAvatar => _isUploadingAvatar.value;
   final _selectedImageFile = Rx<File?>(null);
@@ -34,11 +37,20 @@ class ProfileController extends GetxController {
   String? get _currentImagePath =>
       _selectedImageFile.value?.path ?? _selectedImagePath.value;
   User? get currentUser => authController.currentUser;
+  HealthyAdviceModel? get healthyAdvice => authController.healthyAdvice;
 
   @override
   void onInit() {
     super.onInit();
     _initializeControllers();
+    _fetchHealthyAdviceIfNeeded();
+  }
+
+  /// Fetch healthy advice nếu chưa có hoặc cần refresh
+  Future<void> _fetchHealthyAdviceIfNeeded() async {
+    if (healthyAdvice == null) {
+      await authController.fetchHealthyAdvice();
+    }
   }
 
   void _initializeControllers() {
@@ -317,6 +329,48 @@ class ProfileController extends GetxController {
     }
   }
 
+  Future<bool> updateMeasurement({
+    required int weight,
+    required int height,
+    int? chest,
+    int? waist,
+    int? hip,
+    String? healthyGoal,
+  }) async {
+    try {
+      _isUpdatingMeasurement.value = true;
+      final response = await apiClient.updateMeasurement(
+        weight: weight,
+        height: height,
+        chest: chest,
+        waist: waist,
+        hip: hip,
+        healthyGoal: healthyGoal,
+      );
+
+      final statusCode = response.status ?? 0;
+      if (statusCode >= 200 && statusCode < 300) {
+        await authController.getMe();
+        AppToast.success('Thành công', 'Cập nhật số đo thành công');
+        return true;
+      }
+
+      AppToast.error(
+        'Lỗi',
+        response.message ?? 'Cập nhật số đo thất bại',
+      );
+      return false;
+    } catch (e) {
+      AppToast.error(
+        'Lỗi',
+        'Không thể cập nhật số đo: ${e.toString()}',
+      );
+      return false;
+    } finally {
+      _isUpdatingMeasurement.value = false;
+    }
+  }
+
   Future<void> saveProfile() async {
     try {
       _isLoading.value = true;
@@ -344,5 +398,13 @@ class ProfileController extends GetxController {
     } finally {
       _isLoading.value = false;
     }
+  }
+
+  Future<void> refreshProfile() async {
+    await Future.wait([
+      authController.getMe(),
+      authController.fetchHealthyAdvice(),
+    ]);
+    _initializeControllers();
   }
 }

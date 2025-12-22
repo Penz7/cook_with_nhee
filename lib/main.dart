@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'app_config.dart';
 import 'commons/routes/route.dart';
@@ -78,10 +79,18 @@ class _AppState extends State<App> {
       debugShowCheckedModeBanner: false,
       title: Env().appName,
       theme: ThemeData(
+        appBarTheme: AppBarTheme(
+          elevation: 0,
+          scrolledUnderElevation: 0.0,
+          shadowColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+        ),
         colorScheme: lightScheme,
         scaffoldBackgroundColor: lightScheme.surface,
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
+        fontFamily: GoogleFonts.manrope().fontFamily,
+        textTheme: GoogleFonts.manropeTextTheme(),
         cardTheme: CardThemeData(
           color: lightScheme.surface,
         ),
@@ -93,7 +102,6 @@ class _AppState extends State<App> {
       initialRoute: Routes.splash.p,
       locale: Locale('en'),
       builder: (context, c) {
-        final theme = Theme.of(context);
         final content = Overlay(
           initialEntries: [
             OverlayEntry(

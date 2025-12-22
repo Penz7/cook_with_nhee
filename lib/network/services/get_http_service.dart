@@ -22,7 +22,7 @@ class GetHttpService extends GetxService implements IHttpClient {
     ApiMethod method,
     String url, {
     Map<String, String>? headers,
-    Map<String, String>? query,
+    Map<String, dynamic>? query,
     dynamic body,
     String? contentType,
     Function(double percent)? uploadProgress,
@@ -52,10 +52,10 @@ class GetHttpService extends GetxService implements IHttpClient {
         // log('========> Headers: $headers');
       }
       if (query.isNotEmpty) {
-        // log('========> Query: $query');
+        log('========> Query: $query');
       }
       if (body != null) {
-        // log('========> Body: $body');
+        log('========> Body: $body');
       }
 
       final response = await _http
@@ -75,10 +75,10 @@ class GetHttpService extends GetxService implements IHttpClient {
       if (body != null) {
         // log('Body: $body');
       }
-      // log('Query: $query');
-      // log('========> RESPONSE BODY: ${response.body}');
-      // log(
-      //     '========> RESPONSE STATUS: ${response.statusCode} ${response.statusText ?? ''}');
+      log('Query: $query');
+      log('========> RESPONSE BODY: ${response.body}');
+      log(
+          '========> RESPONSE STATUS: ${response.statusCode} ${response.statusText ?? ''}');
 
       if (response.statusCode != null && response.statusCode! < 400) {
         return response.body;
@@ -87,31 +87,47 @@ class GetHttpService extends GetxService implements IHttpClient {
             '========> CALL API ERROR: ${response.statusCode} | ${response.statusText}');
         log('========> ERROR RESPONSE BODY: ${response.body}');
 
-        if (response.statusCode == 401) {
-          throw Exception();
+        // Lấy message từ response body nếu có
+        String? errorMessage;
+        if (response.body is Map) {
+          errorMessage = response.body['message']?.toString();
         }
-        if (response.body is Map && response.body['message'] != null) {
-          throw response.body['message'];
+        
+        // Nếu không có message, dùng message mặc định dựa trên status code
+        if (errorMessage == null || errorMessage.isEmpty) {
+          if (response.statusCode == 401) {
+            errorMessage = 'Email hoặc mật khẩu không đúng';
+          } else if (response.statusCode == 400) {
+            errorMessage = 'Yêu cầu không hợp lệ';
+          } else if (response.statusCode == 404) {
+            errorMessage = 'Không tìm thấy tài nguyên';
+          } else if (response.statusCode == 500) {
+            errorMessage = 'Lỗi máy chủ. Vui lòng thử lại sau';
+          } else {
+            errorMessage = 'Đã xảy ra lỗi. Vui lòng thử lại';
+          }
         }
-        if (response.statusCode == null ||
-            (response.statusText != null &&
-                response.statusText!
-                    .contains('SocketException: Failed host lookup:'))) {
-          throw Exception();
-        }
-        throw Exception();
+        
+        // Throw exception với message
+        throw Exception(errorMessage);
       }
     } on GetHttpException catch (e, s) {
       log('========> GetHttpException: ${e.message}');
       log('========> GetHttpException runtimeType: ${e.runtimeType}');
       log('========> GetHttpException stackTrace: $s');
-      throw e.message;
+      // Throw với message từ GetHttpException
+      final errorMsg = e.message.isNotEmpty ? e.message : 'Đã xảy ra lỗi kết nối';
+      throw Exception(errorMsg);
     } catch (e, s) {
       // Ghi log fallback cho mọi loại Exception còn lại (ví dụ: XMLHttpRequest error, lỗi CORS, timeout...)
       log('========> UNEXPECTED HTTP ERROR: $e');
       log('========> UNEXPECTED HTTP ERROR TYPE: ${e.runtimeType}');
       log('========> UNEXPECTED HTTP ERROR STACKTRACE: $s');
-      throw Exception();
+      // Nếu exception đã có message, giữ nguyên; nếu không có thì dùng message mặc định
+      final errorMsg = e.toString().replaceFirst('Exception: ', '');
+      throw Exception(errorMsg.isNotEmpty && errorMsg != 'Exception' 
+          ? errorMsg 
+          : 'Đã xảy ra lỗi kết nối. Vui lòng kiểm tra internet và thử lại');
     }
   }
 }

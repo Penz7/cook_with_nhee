@@ -54,7 +54,7 @@ class PrimaryScaffold extends StatelessWidget {
           decoration: backgroundColor ?? BoxDecoration(
             color: UIColors.backgroundColor,
           ),
-          child: body!,
+          child: SafeArea(child: body!),
         ),
         bottomNavigationBar: bottomNavigationBar,
         floatingActionButton: floatingActionButton,

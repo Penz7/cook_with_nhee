@@ -21,7 +21,7 @@ class ApiResponseEntity<T> {
   }
 
   ApiResponseEntity.fromJson(dynamic json, T Function(dynamic) fromJsonT) {
-    _status = json['status'];
+    _status = _parseStatus(json['status']);
     _data = json['data'] != null ? fromJsonT(json['data']) : null;
     _message = json['message'];
   }
@@ -53,5 +53,16 @@ class ApiResponseEntity<T> {
         : _data;
     map['message'] = _message;
     return map;
+  }
+
+  // Hỗ trợ cả status dạng int hoặc string ("success"/"ok"/"201")
+  int? _parseStatus(dynamic status) {
+    if (status is int) return status;
+    if (status is String) {
+      final normalized = status.toLowerCase();
+      if (normalized == 'success' || normalized == 'ok') return 200;
+      return int.tryParse(status);
+    }
+    return null;
   }
 }

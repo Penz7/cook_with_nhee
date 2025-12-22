@@ -5,7 +5,7 @@ abstract class IHttpClient {
       ApiMethod method,
       String url, {
         Map<String, String>? headers,
-        Map<String, String>? query,
+        Map<String, dynamic>? query,
         dynamic body,
         String? contentType,
         Function(double percent)? uploadProgress,

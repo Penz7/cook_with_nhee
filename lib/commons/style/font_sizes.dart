@@ -3,7 +3,7 @@ class FontSizes {
   static const double extraSmall = 12;
   static const double moreSmall = 14;
   static const double small = 16;
-  static const double medium = 22;
+  static const double medium = 20;
   static const double big = 24;
   static const double title = 26;
   static const double extra = 28;

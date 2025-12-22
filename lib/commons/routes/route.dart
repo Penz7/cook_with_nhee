@@ -1,12 +1,24 @@
+import 'package:cook_with_nhee/features/authentication/authentication_page.dart';
 import 'package:cook_with_nhee/features/authentication/login/login_page.dart';
+import 'package:cook_with_nhee/features/authentication/register/register_page.dart';
+import 'package:cook_with_nhee/features/bmi_calculator/bmi_calculator_page.dart';
+import 'package:cook_with_nhee/features/create_recipe/create_recipe_page.dart';
+import 'package:cook_with_nhee/features/intro/intro_page.dart';
 import 'package:cook_with_nhee/features/my_recipes/my_recipes_page.dart';
+import 'package:cook_with_nhee/features/news_detail/news_detail_binding.dart';
+import 'package:cook_with_nhee/features/news_detail/news_detail_page.dart';
 import 'package:cook_with_nhee/features/profile/profile_page.dart';
+import 'package:cook_with_nhee/features/profile/user_info/user_favourite_page.dart';
+import 'package:cook_with_nhee/features/profile/user_info/user_favourite_controller.dart';
+import 'package:cook_with_nhee/features/search_recipe/search_recipe_page.dart';
+import 'package:cook_with_nhee/features/unlock_upgrade/unlock_upgrade_page.dart';
 import 'package:cook_with_nhee/network/models/login_model.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 import '../../controller/auth_controller.dart';
-import '../../features/home/home_page.dart';
+import '../../features/main/main_page.dart';
+import '../../features/bmi_calculator/bmi_calculator_binding.dart';
 import '../../features/splash/splash_page.dart';
 
 class Routes {
@@ -14,6 +26,8 @@ class Routes {
   static const intro = RoutePath('/intro');
   static const start = RoutePath('/start');
   static const login = RoutePath('/login');
+  static const auth = RoutePath('/auth');
+  static const register = RoutePath('/register');
   static const unauthenticated = RoutePath('/401');
   static const unauthorized = RoutePath('/403');
   static const home = RoutePath('/main');
@@ -21,9 +35,25 @@ class Routes {
 
   /// profile
   static const profile = RoutePath('/profile');
+  static const userFavourite = RoutePath('/user-favourite');
   
   /// my recipes
   static const myRecipes = RoutePath('/my-recipes');
+  
+  /// unlock upgrade
+  static const unlockUpgrade = RoutePath('/unlock-upgrade');
+  
+  /// bmi calculator
+  static const bmiCalculator = RoutePath('/bmi-calculator');
+  
+  /// create recipe
+  static const createRecipe = RoutePath('/create-recipe');
+  
+  /// search recipe
+  static const searchRecipe = RoutePath('/search-recipe');
+
+  /// news
+  static const newsDetail = RoutePath('/news-detail');
 }
 
 class RoutePath {
@@ -47,6 +77,7 @@ class RoutePath {
 final List<SpecialRoute> privateRoutes = <RoutePath>[
   Routes.home,
   Routes.profile,
+  Routes.userFavourite,
   Routes.myRecipes,
 ].map((e) => SpecialRoute(e.p)).toList();
 
@@ -57,11 +88,30 @@ final List<GetPage> getPages = [
     binding: SplashBinding(),
   ),
   GetPage(name: Routes.unauthorized.sp, page: () => Container()),
-  GetPage(name: Routes.home.sp, page: () => HomePage(), binding: HomeBinding()),
+  GetPage(
+    name: Routes.home.sp,
+    page: () => const MainPage(),
+    binding: MainBinding(),
+  ),
+  GetPage(
+    name: Routes.auth.sp,
+    page: () => const AuthenticationPage(),
+    binding: AuthenticationBinding(),
+  ),
   GetPage(
     name: Routes.login.sp,
     page: () => LoginPage(),
     binding: LoginBinding(),
+  ),
+  GetPage(
+    name: Routes.register.sp,
+    page: () => RegisterPage(),
+    binding: RegisterBinding(),
+  ),
+  GetPage(
+    name: Routes.intro.sp,
+    page: () => IntroPage(),
+    binding: IntroBinding(),
   ),
   GetPage(
     name: Routes.profile.sp,
@@ -69,9 +119,39 @@ final List<GetPage> getPages = [
     binding: ProfileBinding(),
   ),
   GetPage(
+    name: Routes.userFavourite.sp,
+    page: () => const UserFavouritePage(),
+    binding: UserFavouriteBinding(),
+  ),
+  GetPage(
     name: Routes.myRecipes.sp,
     page: () => MyRecipesPage(),
     binding: MyRecipesBinding(),
+  ),
+  GetPage(
+    name: Routes.unlockUpgrade.sp,
+    page: () => const UnlockUpgradePage(),
+    binding: UnlockUpgradeBinding(),
+  ),
+  GetPage(
+    name: Routes.bmiCalculator.sp,
+    page: () => const BMICalculatorPage(),
+    binding: BMICalculatorBinding(),
+  ),
+  GetPage(
+    name: Routes.createRecipe.sp,
+    page: () => const CreateRecipePage(),
+    binding: CreateRecipeBinding(),
+  ),
+  GetPage(
+    name: Routes.searchRecipe.sp,
+    page: () => const SearchRecipePage(),
+    binding: SearchRecipeBinding(),
+  ),
+  GetPage(
+    name: Routes.newsDetail.sp,
+    page: () => const NewsDetailPage(),
+    binding: NewsDetailBinding(),
   ),
 ].map((e) => e.applyMiddleware()).toList();
 

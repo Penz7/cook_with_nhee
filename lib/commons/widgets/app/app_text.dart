@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../style/colors.dart';
 import '../../style/font_sizes.dart';
@@ -20,7 +19,6 @@ class AppText extends Text {
       fontSize: fontSize,
       color: color,
       fontWeight: fontWeight,
-      fontFamily: GoogleFonts.poppins().fontFamily,
     ),
     overflow: textOverflow,
   );
@@ -41,7 +39,6 @@ class AppText extends Text {
       fontSize: fontSize,
       fontWeight: fontWeight,
       decoration: decoration,
-      fontFamily: GoogleFonts.poppins().fontFamily,
     ),
     overflow: textOverflow,
   );
@@ -62,7 +59,6 @@ class AppText extends Text {
       color: color,
       fontSize: fontSize,
       fontWeight: fontWeight,
-      fontFamily: GoogleFonts.poppins().fontFamily,
     ),
     overflow: textOverflow,
   );
@@ -83,7 +79,6 @@ class AppText extends Text {
       color: color,
       fontSize: fontSize,
       fontWeight: fontWeight,
-      fontFamily: GoogleFonts.poppins().fontFamily,
     ),
     overflow: textOverflow,
   );
@@ -93,7 +88,7 @@ class AppText extends Text {
         super.key,
         double? fontSize = FontSizes.medium,
         Color? color = UIColors.textColor,
-        FontWeight? fontWeight = FontWeight.w700,
+        FontWeight? fontWeight = FontWeight.bold,
         super.maxLines,
         TextOverflow? textOverflow = TextOverflow.ellipsis,
         super.textAlign,
@@ -103,7 +98,6 @@ class AppText extends Text {
       color: color,
       fontSize: fontSize,
       fontWeight: fontWeight,
-      fontFamily: GoogleFonts.poppins().fontFamily,
     ),
     overflow: textOverflow,
   );

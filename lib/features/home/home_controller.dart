@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../network/models/recipe_model.dart';
-import '../../network/models/recipe_model_extension.dart';
 import '../../network/provider/api_client.dart';
 
 class HomeController extends GetxController {
@@ -13,17 +12,36 @@ class HomeController extends GetxController {
   final ApiClient _apiClient;
 
   HomeController(this.authController, this._apiClient) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {});
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future.wait([
+        getRecipeOfDay(),
+        getRecommendationRecipes(),
+        authController.loadSavedRecipes(),
+      ]);
+    });
   }
+
 
   final RxBool isLoading = false.obs;
   final RxList<RecipeModel> recipes = <RecipeModel>[].obs;
   final RxString ingredients = ''.obs;
-  final RxMap<String, bool> savingRecipes = <String, bool>{}.obs;
-  final RxSet<String> savedRecipes = <String>{}.obs;
+
+  final RxBool isLoadingRecipeOfDay = false.obs;
+
+  final Rx<RecipeModel?> recipeOfDay = Rx<RecipeModel?>(null);
+
+  final RxBool isLoadingRecommendations = false.obs;
+  final RxList<RecipeModel> recommendationRecipes = <RecipeModel>[].obs;
+
+  bool get isInitialDataLoaded =>
+      !isLoadingRecipeOfDay.value && !isLoadingRecommendations.value;
+
+  Future<void> loadSavedRecipes() async {
+    await authController.loadSavedRecipes();
+  }
+
 
   Future<void> getMagicRecipe() async {
-    // Kiểm tra phải có ít nhất 1 nguyên liệu trước khi gọi API
     if (ingredients.value.trim().isEmpty) {
       AppToast.info(
         'Thiếu nguyên liệu',
@@ -37,7 +55,6 @@ class HomeController extends GetxController {
       final response = await _apiClient.getMagicRecipes(ingredients.value);
 
       recipes.value = response;
-      savingRecipes.clear();
       await authController.getMe();
     } catch (e) {
       debugPrint('Lỗi gọi API: $e');
@@ -49,38 +66,52 @@ class HomeController extends GetxController {
   }
 
   Future<void> saveRecipe(RecipeModel recipe) async {
-    final recipeKey = recipe.name ?? '';
-    if (recipeKey.isEmpty) return;
-
-    try {
-      savingRecipes[recipeKey] = true;
-      final recipeFromApi = recipe.toRecipeFromApiModel();
-      final response = await _apiClient.saveRecipe(recipeFromApi);
-      if (response.status == 200 || response.status == 201) {
-        savedRecipes.add(recipeKey);
-        AppToast.success(
-          'Thành công',
-          'Đã lưu công thức "${recipe.name}" vào danh sách của bạn',
-        );
-      }
-    } catch (e) {
-      debugPrint('Lỗi lưu recipe: $e');
-      AppToast.error(
-        'Lỗi',
-        'Không thể lưu công thức. Vui lòng thử lại.',
-      );
-    } finally {
-      savingRecipes[recipeKey] = false;
-    }
+    await authController.saveRecipe(recipe);
   }
 
   bool isSavingRecipe(RecipeModel recipe) {
-    final recipeKey = recipe.name ?? '';
-    return savingRecipes[recipeKey] ?? false;
+    return authController.isSavingRecipe(recipe);
   }
 
   bool isRecipeSaved(RecipeModel recipe) {
-    final recipeKey = recipe.name ?? '';
-    return savedRecipes.contains(recipeKey);
+    return authController.isRecipeSaved(recipe);
+  }
+
+
+  Future<void> getRecipeOfDay() async {
+    try {
+      isLoadingRecipeOfDay.value = true;
+      final response = await _apiClient.getRecipeOfDay();
+      if (response.isNotEmpty) {
+        recipeOfDay.value = response.first;
+      } else {
+        recipeOfDay.value = null;
+      }
+    } catch (e) {
+      debugPrint('Lỗi lấy công thức của ngày: $e');
+      recipeOfDay.value = null;
+    } finally {
+      isLoadingRecipeOfDay.value = false;
+    }
+  }
+
+  Future<void> getRecommendationRecipes() async {
+    try {
+      isLoadingRecommendations.value = true;
+      final response = await _apiClient.getRecommendationRecipes();
+      recommendationRecipes.value = response;
+    } catch (e) {
+      debugPrint('Lỗi lấy danh sách công thức đề xuất: $e');
+      recommendationRecipes.value = [];
+    } finally {
+      isLoadingRecommendations.value = false;
+    }
+  }
+
+  Future<void> refreshHomeData() async {
+    await Future.wait([
+      getRecipeOfDay(),
+      getRecommendationRecipes(),
+    ]);
   }
 }

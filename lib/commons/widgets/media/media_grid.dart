@@ -165,6 +165,7 @@ class MediaGrid extends StatelessWidget {
       url: imageUrl,
       borderRadius: 12,
       fit: BoxFit.cover,
+      isFood: true,
     );
   }
 

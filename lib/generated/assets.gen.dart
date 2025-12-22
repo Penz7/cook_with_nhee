@@ -14,12 +14,42 @@ import 'package:flutter/widgets.dart';
 class $AssetsIconsGen {
   const $AssetsIconsGen();
 
+  /// File path: assets/icons/ic_apple.png
+  AssetGenImage get icApple => const AssetGenImage('assets/icons/ic_apple.png');
+
+  /// File path: assets/icons/ic_body_measurement.png
+  AssetGenImage get icBodyMeasurement =>
+      const AssetGenImage('assets/icons/ic_body_measurement.png');
+
+  /// File path: assets/icons/ic_diet.png
+  AssetGenImage get icDiet => const AssetGenImage('assets/icons/ic_diet.png');
+
+  /// File path: assets/icons/ic_facebook.png
+  AssetGenImage get icFacebook =>
+      const AssetGenImage('assets/icons/ic_facebook.png');
+
+  /// File path: assets/icons/ic_google.png
+  AssetGenImage get icGoogle =>
+      const AssetGenImage('assets/icons/ic_google.png');
+
   /// File path: assets/icons/ic_setting.png
   AssetGenImage get icSetting =>
       const AssetGenImage('assets/icons/ic_setting.png');
 
+  /// File path: assets/icons/ic_target.png
+  AssetGenImage get icTarget =>
+      const AssetGenImage('assets/icons/ic_target.png');
+
   /// List of all assets
-  List<AssetGenImage> get values => [icSetting];
+  List<AssetGenImage> get values => [
+    icApple,
+    icBodyMeasurement,
+    icDiet,
+    icFacebook,
+    icGoogle,
+    icSetting,
+    icTarget,
+  ];
 }
 
 class $AssetsImagesGen {
@@ -29,8 +59,16 @@ class $AssetsImagesGen {
   AssetGenImage get appIcon =>
       const AssetGenImage('assets/images/app_icon.png');
 
+  /// File path: assets/images/app_splash.png
+  AssetGenImage get appSplash =>
+      const AssetGenImage('assets/images/app_splash.png');
+
+  /// File path: assets/images/img_healthy.png
+  AssetGenImage get imgHealthy =>
+      const AssetGenImage('assets/images/img_healthy.png');
+
   /// List of all assets
-  List<AssetGenImage> get values => [appIcon];
+  List<AssetGenImage> get values => [appIcon, appSplash, imgHealthy];
 }
 
 class Assets {

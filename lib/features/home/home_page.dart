@@ -1,19 +1,19 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:cook_with_nhee/commons/extensions/number_extension.dart';
 import 'package:cook_with_nhee/commons/routes/route.dart';
 import 'package:cook_with_nhee/commons/style/colors.dart';
+import 'package:cook_with_nhee/commons/style/font_sizes.dart';
+import 'package:cook_with_nhee/commons/widgets/app/app_image.dart';
+import 'package:cook_with_nhee/commons/widgets/app/app_text.dart';
+import 'package:cook_with_nhee/commons/widgets/app/app_toast.dart';
 import 'package:cook_with_nhee/commons/widgets/app/primary_scaffold.dart';
-import 'package:cook_with_nhee/generated/assets.gen.dart';
+import 'package:cook_with_nhee/commons/extensions/color_extension.dart';
+import 'package:cook_with_nhee/features/home/components/recommendation_recipes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../commons/extensions/number_extension.dart';
-import '../../commons/widgets/app/app_image.dart';
-import '../../commons/widgets/app/app_text.dart';
-import '../../commons/widgets/card/app_card.dart';
-import '../../commons/widgets/items/recipe_items.dart';
 import '../../network/provider/api_client.dart';
-import '../recipe_detail/recipe_detail_page.dart';
-import '../../commons/widgets/app/app_drawer.dart';
-import 'components/ingredient_selector.dart';
+import 'components/recipe_of_the_day_card.dart';
 import 'home_controller.dart';
 
 class HomeBinding extends Bindings {
@@ -26,285 +26,385 @@ class HomeBinding extends Bindings {
 class HomePage extends GetView<HomeController> {
   const HomePage({super.key});
 
+  String _greetingMessage() {
+    final hour = DateTime.now().hour;
+    if (hour >= 5 && hour < 11) return 'Chào buổi sáng,';
+    if (hour >= 11 && hour < 13) return 'Chào buổi trưa,';
+    if (hour >= 13 && hour < 18) return 'Chào buổi chiều,';
+    return 'Chào buổi tối,';
+  }
+
   @override
   Widget build(BuildContext context) {
     return PrimaryScaffold(
-      drawer: AppDrawer(authController: controller.authController),
+      backgroundColor: const BoxDecoration(color: UIColors.creamy),
       body: Builder(
-        builder: (scaffoldContext) => Obx(
-          () => Stack(
-            children: [
-              SafeArea(
-                child: ListView(
-                  padding: const EdgeInsets.all(20),
-                  children: [
-              Obx(() {
-                final currentUser = controller.authController.currentUser;
-                return Row(
-                  mainAxisAlignment: .spaceBetween,
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        Scaffold.of(scaffoldContext).openDrawer();
-                      },
-                      icon: Assets.icons.icSetting.image(
-                        width: 25,
-                        height: 25,
-                        color: UIColors.textColor,
+        builder: (scaffoldContext) => Obx(() {
+          final greeting = _greetingMessage();
+          final currentUser = controller.authController.currentUser;
+          final userName = currentUser?.name ?? 'Người dùng';
+          final userAvatar = currentUser?.avatar ?? '';
+          return RefreshIndicator(
+            onRefresh: controller.refreshHomeData,
+            color: UIColors.pink,
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 24,
                       ),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        Get.toNamed(Routes.profile.p);
-                      },
-                      child: AppInternetImage(
-                        url: currentUser?.avatar ?? '',
-                        width: 60,
-                        height: 60,
-                        borderRadius: 50,
-                      ),
-                    ),
-                  ],
-                );
-              }),
-              20.height,
-              AppCard(
-                body: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            color: Colors.pink.shade100,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: const Icon(
-                            Icons.auto_awesome,
-                            color: Colors.white,
-                            size: 22,
-                          ),
-                        ),
-                        12.width,
-                        Expanded(
-                          child: AppText.medium(
-                            "“Chỉ cần có nguyên liệu, món ngon luôn chờ bạn sáng tạo.”",
-                            fontSize: 15,
-                            color: Colors.pink.shade900,
-                            fontWeight: FontWeight.w600,
-                            maxLines: 3,
-                          ),
-                        ),
-                      ],
-                    ),
-                    20.height,
-                    AppText.semiBold(
-                      "Nguyên liệu bạn đang có",
-                      fontSize: 14,
-                      color: Colors.pink.shade700,
-                    ),
-                    8.height,
-                    IngredientSelector(
-                      initialIngredients: const [],
-                      onChange: (selected) {
-                        controller.ingredients.value = selected.join(', ');
-                      },
-                    ),
-                    20.height,
-                    Obx(
-                      () => SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.pink.shade400,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            elevation: 2,
-                          ),
-                          onPressed: controller.isLoading.value
-                              ? null
-                              : () async {
-                                  await controller.getMagicRecipe();
-                                },
-                          child: controller.isLoading.value
-                              ? Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                          Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                    10.width,
-                                    AppText.semiBold(
-                                      "Đang tạo công thức...",
-                                      fontSize: 15,
-                                      color: Colors.white,
-                                    ),
-                                  ],
-                                )
-                              : Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(
-                                      Icons.auto_awesome_rounded,
-                                      color: Colors.white,
-                                      size: 20,
-                                    ),
-                                    8.width,
-                                    AppText.semiBold(
-                                      "Tạo công thức ngay",
-                                      fontSize: 15,
-                                      color: Colors.white,
-                                    ),
-                                  ],
-                                ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              32.height,
-              Obx(
-                () => Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    AppText.bold(
-                      "Gợi ý cho bạn",
-                      fontSize: 18,
-                      color: Colors.pink.shade800,
-                    ),
-                    if (controller.recipes.isNotEmpty)
-                      TextButton(
-                        onPressed: () {
-                          controller.recipes.clear();
-                        },
-                        child: AppText.regular(
-                          "Xoá kết quả",
-                          fontSize: 13,
-                          color: Colors.pink.shade400,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              12.height,
-                    Obx(() {
-                      if (controller.recipes.isEmpty) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 24.0),
-                          child: Column(
+                      child: Row(
+                        children: [
+                          Stack(
                             children: [
-                              Icon(
-                                Icons.menu_book_outlined,
-                                size: 40,
-                                color: Colors.pink.shade200,
+                              AppInternetImage(
+                                url: userAvatar,
+                                width: 50,
+                                height: 50,
+                                borderRadius: 25,
                               ),
-                              8.height,
-                              AppText.regular(
-                                'Chưa có công thức nào.\nHãy thêm nguyên liệu và bấm "Tạo công thức" nhé!',
-                                textAlign: TextAlign.center,
-                                fontSize: 14,
-                                color: Colors.pink.shade400,
-                                maxLines: 5,
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: Container(
+                                  width: 14,
+                                  height: 14,
+                                  decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 2,
+                                    ),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
-                        );
-                      }
-                      return ListView.separated(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: controller.recipes.length,
-                        separatorBuilder: (_, _) =>
-                            const SizedBox(height: 12),
-                        itemBuilder: (context, index) {
-                          final recipe = controller.recipes[index];
-                          return InkWell(
-                            onTap: () {
-                              Get.to(
-                                () => RecipeDetailPage(recipe: recipe),
-                              );
-                            },
-                            child: Obx(
-                              () => RecipeItems(
-                                recipe: recipe,
-                                showSaveButton: true,
-                                isSaving: controller.isSavingRecipe(recipe),
-                                isSaved: controller.isRecipeSaved(recipe),
-                                onSave: () {
-                                  controller.saveRecipe(recipe);
+                          12.width,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                AppText.regular(
+                                  greeting,
+                                  fontSize: FontSizes.moreSmall,
+                                ),
+                                2.height,
+                                AppText.bold(
+                                  userName,
+                                  fontSize: FontSizes.medium,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Stack(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  AppToast.info(
+                                    'Thông báo',
+                                    'Bạn có thông báo mới.',
+                                  );
                                 },
+                                icon: const Icon(
+                                  Icons.notifications_outlined,
+                                  color: Colors.black87,
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      );
-                    }),
-                  ],
-                ),
-              ),
-              if (controller.isLoading.value)
-                Positioned.fill(
-                  child: Container(
-                    color: Colors.white.withOpacity(0.85),
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const SizedBox(
-                            width: 36,
-                            height: 36,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 3,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.pink,
+                              Positioned(
+                                top: 10,
+                                right: 10,
+                                child: Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: const BoxDecoration(
+                                    color: UIColors.pink,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                          20.height,
-                          AppText.semiBold(
-                            "Đang tạo công thức cho bạn...",
-                            fontSize: 16,
-                            color: Colors.pink.shade800,
-                            textAlign: TextAlign.center,
-                          ),
-                          8.height,
-                          AppText.regular(
-                            "Đang phân tích nguyên liệu bạn có...",
-                            fontSize: 13,
-                            color: Colors.pink.shade400,
-                            textAlign: TextAlign.center,
-                          ),
-                          4.height,
-                          AppText.regular(
-                            "Kết hợp gia vị và gợi ý món ngon phù hợp.",
-                            fontSize: 13,
-                            color: Colors.pink.shade400,
-                            textAlign: TextAlign.center,
+                            ],
                           ),
                         ],
                       ),
                     ),
                   ),
                 ),
-            ],
-          ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: InkWell(
+                      onTap: () {
+                        Get.toNamed(Routes.searchRecipe.p);
+                      },
+                      child: Container(
+                        height: 45,
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.opacityColor(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: DefaultTextStyle(
+                                style: TextStyle(
+                                  fontSize: FontSizes.small,
+                                  color: UIColors.textColor.opacityColor(0.8),
+                                ),
+                                child: AnimatedTextKit(
+                                  pause: const Duration(seconds: 1),
+                                  repeatForever: true,
+                                  onTap: () {
+                                    Get.toNamed(Routes.searchRecipe.p);
+                                  },
+                                  animatedTexts: [
+                                    RotateAnimatedText(
+                                      '🥗 Tìm món ăn healthy, giảm cân',
+                                      transitionHeight: 40,
+                                      duration: const Duration(
+                                        seconds: 3,
+                                      ),
+                                    ),
+                                    RotateAnimatedText(
+                                      '🍜 Món Thái Lan, Nhật Bản, Châu Âu...',
+                                      transitionHeight: 40,
+                                      duration: const Duration(seconds: 3),
+                                    ),
+                                    RotateAnimatedText(
+                                      '🍳 Đồ ăn sáng tăng cân, tăng cơ',
+                                      transitionHeight: 40,
+                                      duration: const Duration(seconds: 3),
+                                    ),
+                                    RotateAnimatedText(
+                                      '🌱 Món chay, ăn kiêng, detox',
+                                      transitionHeight: 40,
+                                      duration: const Duration(seconds: 3),
+                                    ),
+                                    RotateAnimatedText(
+                                      '🧁 Bánh ngọt, dessert, kem',
+                                      transitionHeight: 40,
+                                      duration: const Duration(seconds: 3),
+                                    ),
+                                    RotateAnimatedText(
+                                      '🔥 Món nướng, BBQ, lẩu',
+                                      transitionHeight: 40,
+                                      duration: const Duration(seconds: 3),
+                                    ),
+                                    RotateAnimatedText(
+                                      '🥤 Salad, smoothie, nước ép',
+                                      transitionHeight: 40,
+                                      duration: const Duration(seconds: 3),
+                                    ),
+                                    RotateAnimatedText(
+                                      '🇻🇳 Món Việt Nam truyền thống',
+                                      transitionHeight: 40,
+                                      duration: const Duration(seconds: 3),
+                                    ),
+                                    RotateAnimatedText(
+                                      '🍿 Đồ ăn vặt, snack, finger food',
+                                      transitionHeight: 40,
+                                      duration: const Duration(seconds: 3),
+                                    ),
+                                    RotateAnimatedText(
+                                      '👶 Món cho bé, dinh dưỡng',
+                                      transitionHeight: 40,
+                                      duration: const Duration(seconds: 3),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SliverToBoxAdapter(child: 30.height),
+                SliverToBoxAdapter(
+                  child: Obx(() {
+                    if (!controller.isInitialDataLoaded) {
+                      return Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: 20,
+                              right: 20,
+                              bottom: 20,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                AppText.bold(
+                                  'Công thức trong ngày',
+                                  fontSize: FontSizes.medium,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const RecipeOfTheDayCard(),
+                          20.height,
+                          const RecommendationRecipes(),
+                        ],
+                      );
+                    }
+
+                    return Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            left: 20,
+                            right: 20,
+                            bottom: 20,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              AppText.bold(
+                                'Công thức trong ngày',
+                                fontSize: FontSizes.medium,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const RecipeOfTheDayCard(),
+                        20.height,
+                        const RecommendationRecipes(),
+                      ],
+                    );
+                  }),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 24,
+                    ),
+                    child: const _CreateWithAISection(),
+                  ),
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 100)),
+              ],
+            ),
+          );
+        }),
+      ),
+    );
+  }
+}
+
+class _CreateWithAISection extends StatelessWidget {
+  const _CreateWithAISection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1F1A2E), Color(0xFF2C1F3C)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.opacityColor(0.20),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppText.bold(
+                  'Tạo với AI',
+                  fontSize: FontSizes.moreSmall,
+                  color: Colors.white,
+                ),
+                8.height,
+                AppText.medium(
+                  'Tạo kế hoạch bữa ăn tùy chỉnh dựa trên nguyên liệu của bạn.',
+                  fontSize: FontSizes.extraSmall,
+                  color: Colors.white.opacityColor(0.8),
+                  maxLines: 2,
+                ),
+                14.height,
+                InkWell(
+                  onTap: () {
+                    Get.toNamed(Routes.createRecipe.p);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AppText.bold(
+                          'Thử Generator',
+                          fontSize: FontSizes.extraSmall,
+                          color: Colors.black87,
+                        ),
+                        8.width,
+                        const Icon(
+                          Icons.arrow_forward,
+                          size: 20,
+                          color: Colors.black87,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          12.width,
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: const LinearGradient(
+                colors: [UIColors.pink, UIColors.purple],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.opacityColor(0.12),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.auto_awesome,
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
+        ],
       ),
     );
   }
