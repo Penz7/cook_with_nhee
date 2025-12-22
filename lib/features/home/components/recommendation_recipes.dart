@@ -121,7 +121,7 @@ class RecommendationRecipes extends GetView<HomeController> {
           ),
           15.height,
           SizedBox(
-            height: 230,
+            height: 240,
             child: isLoading
                 ? const AppRecommendationShimmer()
                 : recipes.isEmpty
@@ -193,7 +193,7 @@ class _RecommendationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final imageUrl = _extractImageUrl();
-    
+
     return Container(
       width: 220,
       decoration: BoxDecoration(
@@ -211,9 +211,7 @@ class _RecommendationCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(18),
-            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
             child: SizedBox(
               height: 130,
               width: double.infinity,
@@ -294,19 +292,22 @@ class _RecommendationCard extends StatelessWidget {
                 Row(
                   children: [
                     Icon(Icons.bolt, size: 20, color: Colors.pink.shade400),
-                    6.width,
+                    4.width,
                     AppText.bold(
                       item.calories,
                       fontSize: FontSizes.extraSmall,
                       color: Colors.pink.shade700,
                     ),
-                    const Spacer(),
+                    10.width,
                     Icon(Icons.schedule, size: 20, color: Colors.grey.shade500),
-                    6.width,
-                    AppText.medium(
-                      item.duration,
-                      fontSize: FontSizes.extraSmall,
-                      color: Colors.grey.shade700,
+                    4.width,
+                    Expanded(
+                      child: AppText.medium(
+                        item.duration,
+                        fontSize: FontSizes.extraSmall,
+                        color: Colors.grey.shade700,
+                        maxLines: 3,
+                      ),
                     ),
                   ],
                 ),

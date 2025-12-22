@@ -6,6 +6,7 @@ import 'package:cook_with_nhee/commons/style/colors.dart';
 import 'package:cook_with_nhee/commons/style/font_sizes.dart';
 import 'package:cook_with_nhee/commons/widgets/app/app_image.dart';
 import 'package:cook_with_nhee/commons/widgets/app/app_text.dart';
+import 'package:cook_with_nhee/commons/widgets/app/app_toast.dart';
 import 'package:cook_with_nhee/commons/widgets/app/primary_scaffold.dart';
 import 'package:cook_with_nhee/generated/assets.gen.dart';
 import 'package:flutter/material.dart';
@@ -70,28 +71,28 @@ class AuthenticationPage extends GetView<AuthenticationController> {
                   : _buildGradientPlaceholder(),
             ),
             Positioned(
-              bottom: 50,
+              bottom: 70,
               left: 24,
               right: 24,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                    width: 250,
+                    width: 280,
                     child: AppText.bold(
                       slide['title'] ?? '',
                       color: Colors.white,
-                      maxLines: 2,
+                      maxLines: 3,
                     ),
                   ),
                   10.height,
                   SizedBox(
-                    width: 300,
+                    width: 350,
                     child: AppText.regular(
                       slide['description'] ?? '',
                       color: Colors.white,
                       fontSize: FontSizes.moreSmall,
-                      maxLines: 2,
+                      maxLines: 4,
                     ),
                   ),
                 ],
@@ -165,20 +166,26 @@ class AuthenticationPage extends GetView<AuthenticationController> {
           20.height,
           _buildSocialButton(
             Assets.icons.icApple.path,
-            'Continue with Apple',
-            () {},
+            'Đăng nhập với Apple',
+            () {
+              AppToast.info('Sắp ra mắt!', 'Tính năng đang được hoàn thiện để mang lại trải nghiệm tốt nhất cho bạn.');
+            },
           ),
           12.height,
           _buildSocialButton(
             Assets.icons.icGoogle.path,
-            'Continue with Google',
-            () {},
+            'Đăng nhập với Google',
+            () {
+              AppToast.info('Sắp ra mắt!', 'Tính năng đang được hoàn thiện để mang lại trải nghiệm tốt nhất cho bạn.');
+            },
           ),
           12.height,
           _buildSocialButton(
             Assets.icons.icFacebook.path,
-            'Continue with Facebook',
-            () {},
+            'Đăng nhập với Facebook',
+            () {
+              AppToast.info('Sắp ra mắt!', 'Tính năng đang được hoàn thiện để mang lại trải nghiệm tốt nhất cho bạn.');
+            },
           ),
           12.height,
           const Divider(indent: 30, endIndent: 30),
@@ -197,7 +204,7 @@ class AuthenticationPage extends GetView<AuthenticationController> {
                 ),
                 8.width,
                 AppText.medium(
-                  'Log in with Email',
+                  'Đăng nhập với email của bạn',
                   fontSize: FontSizes.moreSmall,
                   color: Colors.black,
                 ),
@@ -206,7 +213,7 @@ class AuthenticationPage extends GetView<AuthenticationController> {
           ),
           12.height,
           AppText.regular(
-            'By continuing you agree to FitRecipe\'s Terms & Privacy.',
+            'Bắt đầu hành trình cùng CookWithNhee là bạn đã đồng ý với các Điều khoản và Bảo mật của chúng mình.',
             fontSize: 11,
             color: Colors.grey.shade600,
             textAlign: TextAlign.center,

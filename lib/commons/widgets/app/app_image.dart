@@ -77,7 +77,7 @@ class AppInternetImage extends StatelessWidget {
           image,
           if (isBlur)
             Container(
-              color: Colors.black.opacityColor(0.4),
+              color: Colors.black.opacityColor(0.5),
             ),
         ],
       ),

@@ -101,34 +101,6 @@ class HomePage extends GetView<HomeController> {
                               ],
                             ),
                           ),
-                          Stack(
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  AppToast.info(
-                                    'Thông báo',
-                                    'Bạn có thông báo mới.',
-                                  );
-                                },
-                                icon: const Icon(
-                                  Icons.notifications_outlined,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                              Positioned(
-                                top: 10,
-                                right: 10,
-                                child: Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: const BoxDecoration(
-                                    color: UIColors.pink,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
                         ],
                       ),
                     ),
