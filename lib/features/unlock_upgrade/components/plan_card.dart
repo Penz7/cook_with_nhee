@@ -2,6 +2,8 @@ import 'package:cook_with_nhee/commons/extensions/number_extension.dart';
 import 'package:cook_with_nhee/commons/style/colors.dart';
 import 'package:flutter/material.dart';
 
+import '../../../commons/extensions/color_extension.dart';
+
 class PlanCard extends StatelessWidget {
   const PlanCard({
     super.key,
@@ -41,7 +43,7 @@ class PlanCard extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: (isPro ? UIColors.pink : Colors.blue.shade200)
-                .withOpacity(0.2),
+                .opacityColor(0.2),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),

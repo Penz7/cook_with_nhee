@@ -1,6 +1,7 @@
 import 'package:cook_with_nhee/commons/extensions/number_extension.dart';
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
+
+import '../../../commons/extensions/color_extension.dart';
 
 class BMIDisplayCard extends StatelessWidget {
   const BMIDisplayCard({
@@ -28,7 +29,7 @@ class BMIDisplayCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.opacityColor(0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

@@ -114,7 +114,7 @@ class UnlockUpgradePage extends GetView<UnlockUpgradeController> {
                               boxShadow: !controller.isYearly.value
                                   ? [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
+                                        color: Colors.black.opacityColor(0.1),
                                         blurRadius: 8,
                                         offset: const Offset(0, 2),
                                       ),
@@ -153,7 +153,7 @@ class UnlockUpgradePage extends GetView<UnlockUpgradeController> {
                                   boxShadow: controller.isYearly.value
                                       ? [
                                           BoxShadow(
-                                            color: Colors.black.withOpacity(
+                                            color: Colors.black.opacityColor(
                                               0.1,
                                             ),
                                             blurRadius: 8,

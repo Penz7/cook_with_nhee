@@ -2,9 +2,7 @@ import 'dart:math' as math;
 import 'package:cook_with_nhee/commons/extensions/color_extension.dart';
 import 'package:cook_with_nhee/commons/extensions/number_extension.dart';
 import 'package:cook_with_nhee/commons/style/colors.dart';
-import 'package:cook_with_nhee/commons/style/font_sizes.dart';
 import 'package:cook_with_nhee/commons/widgets/app/app_image.dart';
-import 'package:cook_with_nhee/commons/widgets/app/app_text.dart';
 import 'package:flutter/material.dart';
 
 class FeaturedRecipeCard extends StatelessWidget {

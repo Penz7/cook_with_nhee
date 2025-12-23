@@ -2,6 +2,8 @@ import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../extensions/color_extension.dart';
+
 /// Overlay widget để play video khi click vào video trong grid
 class VideoPlayerOverlay extends StatefulWidget {
   final String videoUrl;
@@ -207,7 +209,7 @@ class _VideoPlayerOverlayState extends State<VideoPlayerOverlay> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.opacityColor(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(

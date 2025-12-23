@@ -2,6 +2,7 @@ import 'package:cook_with_nhee/commons/extensions/number_extension.dart';
 import 'package:cook_with_nhee/commons/style/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../commons/extensions/color_extension.dart';
 import '../bmi_calculator_controller.dart';
 
 class WeightHistoryCard extends StatelessWidget {
@@ -47,7 +48,7 @@ class WeightHistoryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.opacityColor(0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -200,13 +201,12 @@ class _WeightHistoryPainter extends CustomPainter {
     }
 
     final lastX = padding + chartWidth;
-    final lastY = _getYPosition(history.last.weight, chartTop, chartBottom);
     areaPath.lineTo(lastX, chartBottom);
     areaPath.close();
 
     // Fill area
     final areaPaint = Paint()
-      ..color = UIColors.pink.withOpacity(0.2)
+      ..color = UIColors.pink.opacityColor(0.2)
       ..style = PaintingStyle.fill;
     canvas.drawPath(areaPath, areaPaint);
 

@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 
 import '../../../commons/extensions/color_extension.dart';
 import '../../../commons/extensions/number_extension.dart';
-import '../../../commons/style/colors.dart';
 import '../../../commons/style/font_sizes.dart';
 import '../../../commons/widgets/app/app_image.dart';
 import '../../../commons/widgets/app/app_shimmer.dart';

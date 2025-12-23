@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class UnlockUpgradeController extends GetxController {
-  final RxBool isYearly = true.obs; // Default to yearly for better value
+  final RxBool isYearly = true.obs;
 
   void toggleSubscription(bool isYearlyValue) {
     isYearly.value = isYearlyValue;

@@ -213,24 +213,6 @@ class AuthController extends GetxController {
           userDietPreference: userDietPreference,
         );
 
-        if (userMeasurement?.bmi != null && userMeasurement!.bmi! > 0) {
-          try {
-            final healthyAdviceResponse = await _apiClient.getHealthyAdvice(
-              userMeasurement.bmi!.toDouble(),
-            );
-            final statusCode = healthyAdviceResponse.status;
-            if (statusCode != null &&
-                statusCode >= 200 &&
-                statusCode < 300 &&
-                healthyAdviceResponse.data != null) {
-              _healthyAdvice.value = healthyAdviceResponse.data!;
-              debugPrint('Healthy advice fetched successfully');
-            }
-          } catch (e) {
-            debugPrint('Error fetching healthy advice: $e');
-          }
-        }
-
         await _storageService.set(StorageKey.user, jsonEncode(updatedUser.toJson()));
         _currentUser.value = updatedUser;
         return updatedUser;

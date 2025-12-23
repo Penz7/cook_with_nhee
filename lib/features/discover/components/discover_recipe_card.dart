@@ -2,6 +2,8 @@ import 'package:cook_with_nhee/commons/style/colors.dart';
 import 'package:cook_with_nhee/commons/widgets/app/app_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../../commons/extensions/color_extension.dart';
+
 class DiscoverRecipeCard extends StatelessWidget {
   const DiscoverRecipeCard({
     super.key,
@@ -69,11 +71,11 @@ class DiscoverRecipeCard extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.opacityColor(0.9),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
+                        color: Colors.black.opacityColor(0.06),
                         blurRadius: 10,
                         offset: const Offset(0, 6),
                       ),
@@ -144,7 +146,7 @@ class _FavoriteButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final iconColor = isFavorite ? UIColors.pink : Colors.white;
-    final backgroundColor = isFavorite ? Colors.white : Colors.white.withOpacity(0.35);
+    final backgroundColor = isFavorite ? Colors.white : Colors.white.opacityColor(0.35);
 
     return GestureDetector(
       onTap: isSaving ? null : onPressed,
@@ -158,7 +160,7 @@ class _FavoriteButton extends StatelessWidget {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.opacityColor(0.08),
               blurRadius: 10,
               offset: const Offset(0, 6),
             ),

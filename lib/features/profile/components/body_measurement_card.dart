@@ -1,6 +1,8 @@
 import 'package:cook_with_nhee/commons/extensions/number_extension.dart';
 import 'package:flutter/material.dart';
 
+import '../../../commons/extensions/color_extension.dart';
+
 class BodyMeasurementCard extends StatelessWidget {
   const BodyMeasurementCard({
     super.key,
@@ -45,7 +47,7 @@ class BodyMeasurementCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87.withOpacity(0.7),
+                  color: Colors.black87.opacityColor(0.7),
                   letterSpacing: 0.5,
                 ),
               ),

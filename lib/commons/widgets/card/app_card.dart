@@ -1,6 +1,6 @@
+import 'package:cook_with_nhee/commons/extensions/color_extension.dart';
 import 'package:flutter/material.dart';
 
-import '../../style/colors.dart';
 
 class AppCard extends StatelessWidget {
   const AppCard({super.key, required this.body});
@@ -15,7 +15,7 @@ class AppCard extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             Colors.pink.shade50,
-            Colors.pink.shade100.withOpacity(0.6),
+            Colors.pink.shade100.opacityColor(0.6),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -23,7 +23,7 @@ class AppCard extends StatelessWidget {
         borderRadius: const BorderRadius.all(Radius.circular(18)),
         boxShadow: [
           BoxShadow(
-            color: Colors.pink.shade100.withOpacity(0.5),
+            color: Colors.pink.shade100.opacityColor(0.5),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),

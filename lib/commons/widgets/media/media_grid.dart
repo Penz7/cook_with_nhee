@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../extensions/color_extension.dart';
 import '../app/app_image.dart';
 import '../recipe_detail/video_player_overlay.dart';
 
@@ -236,7 +237,7 @@ class MediaGrid extends StatelessWidget {
               child: Icon(
                 Icons.play_circle_filled,
                 size: 48,
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.opacityColor(0.8),
               ),
             ),
             // Play button overlay
@@ -248,7 +249,7 @@ class MediaGrid extends StatelessWidget {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Colors.black.withOpacity(0.5),
+                      Colors.black.opacityColor(0.5),
                     ],
                   ),
                 ),

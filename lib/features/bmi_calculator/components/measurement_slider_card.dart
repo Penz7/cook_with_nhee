@@ -2,6 +2,8 @@ import 'package:cook_with_nhee/commons/extensions/number_extension.dart';
 import 'package:cook_with_nhee/commons/style/colors.dart';
 import 'package:flutter/material.dart';
 
+import '../../../commons/extensions/color_extension.dart';
+
 class MeasurementSliderCard extends StatelessWidget {
   const MeasurementSliderCard({
     super.key,
@@ -39,7 +41,7 @@ class MeasurementSliderCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.opacityColor(0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

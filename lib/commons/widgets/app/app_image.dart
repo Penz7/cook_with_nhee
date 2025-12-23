@@ -135,7 +135,7 @@ class AppInternetImage extends StatelessWidget {
                 imageUrl: imageUrl,
                 fit: BoxFit.contain,
                 httpHeaders: _browserHeaders,
-                errorWidget: (_, __, ___) => Image.asset(
+                errorWidget: (_, _, _) => Image.asset(
                   "assets/images/app_icon.png",
                   fit: BoxFit.contain,
                 ),
@@ -157,7 +157,7 @@ class AppInternetImage extends StatelessWidget {
           height: height > 0 ? height : null,
           fit: fit,
           httpHeaders: _browserHeaders,
-          errorWidget: (_, _, __) => Image.asset(
+          errorWidget: (_, _, _) => Image.asset(
             "assets/images/app_icon.png",
             width: width > 0 ? 2 * width / 3 : null,
             fit: BoxFit.fitWidth,

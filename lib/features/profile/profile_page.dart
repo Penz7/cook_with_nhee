@@ -48,7 +48,6 @@ class ProfilePage extends GetView<ProfileController> {
         final userName = user.name ?? 'Người dùng';
         final avatarUrl = user.avatar ?? '';
         final memberStatus = _getMemberStatus(user.role);
-        final recipeCount = user.totalRecipesSaved ?? 0;
 
         return RefreshIndicator(
           onRefresh: controller.refreshProfile,

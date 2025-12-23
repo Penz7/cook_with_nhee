@@ -9,6 +9,8 @@ import 'package:cook_with_nhee/features/bmi_calculator/bmi_calculator_controller
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../commons/extensions/color_extension.dart';
+
 class BMICalculatorPage extends GetView<BMICalculatorController> {
   const BMICalculatorPage({super.key});
 
@@ -27,7 +29,7 @@ class BMICalculatorPage extends GetView<BMICalculatorController> {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.opacityColor(0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -70,7 +72,7 @@ class BMICalculatorPage extends GetView<BMICalculatorController> {
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.opacityColor(0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),

@@ -172,7 +172,7 @@ class SearchRecipePage extends GetView<SearchRecipeController> {
                 return ListView.separated(
                   padding: const EdgeInsets.all(20),
                   itemCount: controller.recipes.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final recipe = controller.recipes[index];
                     return InkWell(

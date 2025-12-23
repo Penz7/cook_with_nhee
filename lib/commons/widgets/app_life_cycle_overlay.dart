@@ -1,9 +1,5 @@
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-
-import '../extensions/color_extension.dart';
 
 class AppLifecycleOverlay extends StatefulWidget {
   const AppLifecycleOverlay({super.key});
@@ -45,17 +41,6 @@ class _AppLifecycleOverlayState extends State<AppLifecycleOverlay>
         key: ValueKey(shouldBlur.toString()),
         // child: shouldBlur ? _buildBlur() : const SizedBox.shrink(),
         child: const SizedBox.shrink(),
-      ),
-    );
-  }
-
-  Widget _buildBlur() {
-    return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-      child: Container(
-        height: Get.height,
-        width: Get.width,
-        color: Colors.white.opacityColor(0.1),
       ),
     );
   }
